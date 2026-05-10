@@ -1,5 +1,7 @@
 import { useRef, ReactNode } from "react";
-import { Pressable, Text, StyleSheet, Animated, GestureResponderEvent, ViewStyle, TextStyle, StyleProp } from "react-native";
+import { Pressable, StyleSheet, Animated, GestureResponderEvent, ViewStyle, TextStyle, StyleProp } from "react-native";
+
+import Text from "@/components/Text";
 
 type ButtonProps = {
   title?: string;

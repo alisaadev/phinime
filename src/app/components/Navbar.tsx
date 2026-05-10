@@ -1,21 +1,15 @@
 import { useRef, useEffect, useState } from "react";
 import { Ionicons, MaterialCommunityIcons, Feather } from "@expo/vector-icons";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Animated,
-  LayoutChangeEvent,
-} from "react-native";
+import { View, TouchableOpacity, StyleSheet, Animated, LayoutChangeEvent } from "react-native";
 
+import Text from "@/components/Text";
 import colors from "@/constants/colors";
 
 const ITEMS = [
   { label: "Beranda", icon: "home", lib: "ion" },
-  { label: "Superuser", icon: "shield-outline", lib: "mc" },
-  { label: "Modul", icon: "grid", lib: "feather" },
-  { label: "Setelan", icon: "settings-outline", lib: "ion" },
+  { label: "History", icon: "history", lib: "mc" },
+  { label: "Bookmark", icon: "bookmark", lib: "mc" },
+  { label: "Profile", icon: "person", lib: "ion" },
 ];
 
 export default function Navbar({ selectedIndex, onSelect }: any) {
@@ -23,7 +17,6 @@ export default function Navbar({ selectedIndex, onSelect }: any) {
   const slide = useRef(new Animated.Value(0)).current;
   const itemWidth = navWidth / ITEMS.length;
 
-  // animasi scale tiap item
   const scales = useRef(ITEMS.map((_, i) => new Animated.Value(i === 0 ? 1.1 : 1))).current;
   const glows = useRef(ITEMS.map((_, i) => new Animated.Value(i === 0 ? 1 : 0))).current;
 
@@ -126,7 +119,7 @@ const styles = StyleSheet.create({
     bottom: 15,
     width: "100%",
     alignItems: "center",
-    zIndex: 99,
+    zIndex: 99
   },
   container: {
     width: "88%",
@@ -142,7 +135,7 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     shadowOffset: { width: 0, height: 8 },
     elevation: 12,
-    overflow: "visible",
+    overflow: "visible"
   },
   activeBubble: {
     position: "absolute",
@@ -156,7 +149,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
-    elevation: 8,
+    elevation: 8
   },
   item: {
     flex: 1,
@@ -164,19 +157,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 4,
     zIndex: 2,
-    height: "100%",
+    height: "100%"
   },
   iconWrapper: {
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   label: {
     color: "rgba(255,255,255,0.45)",
-    fontSize: 11,
-    fontWeight: "500",
+    fontSize: 8,
+    fontWeight: "500"
   },
   activeLabel: {
     color: colors.accent,
-    fontWeight: "700",
-  },
+    fontSize: 8,
+    fontWeight: "700"
+  }
 });
