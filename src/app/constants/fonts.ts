@@ -9,7 +9,7 @@ const fontMap: Record<string, string> = {
   "800": "Montserrat-ExtraBold",
   "900": "Montserrat-ExtraBold",
   normal: "Montserrat-Regular",
-  bold: "Montserrat-Bold"
+  bold: "Montserrat-Bold",
 };
 
-export default fontMap
+export default fontMap;

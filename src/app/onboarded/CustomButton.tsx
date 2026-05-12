@@ -1,6 +1,16 @@
 import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, TouchableWithoutFeedback, useWindowDimensions } from "react-native";
-import Animated, { SharedValue, interpolateColor, useAnimatedStyle, withSpring, withTiming } from "react-native-reanimated";
+import {
+  StyleSheet,
+  TouchableWithoutFeedback,
+  useWindowDimensions,
+} from "react-native";
+import Animated, {
+  SharedValue,
+  interpolateColor,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 
 type Props = {
   handlePress: () => void;
@@ -14,7 +24,7 @@ export default function CustomButton({ handlePress, buttonVal }: Props) {
     const backgroundColor = interpolateColor(
       buttonVal.value,
       [0, SCREEN_HEIGHT, 2 * SCREEN_HEIGHT, 3 * SCREEN_HEIGHT],
-      ["#F2C4CE", "#C9B8D4", "#A8C8D8", "#EDE8F0"]
+      ["#F2C4CE", "#C9B8D4", "#A8C8D8", "#EDE8F0"],
     );
 
     return { backgroundColor };
@@ -22,34 +32,53 @@ export default function CustomButton({ handlePress, buttonVal }: Props) {
 
   const buttonAnimationStyle = useAnimatedStyle(() => {
     return {
-      width: buttonVal.value === 3 * SCREEN_HEIGHT ? withSpring(260) : withSpring(100),
-      height: buttonVal.value === 3 * SCREEN_HEIGHT ? withSpring(80) : withSpring(100),
+      width:
+        buttonVal.value === 3 * SCREEN_HEIGHT
+          ? withSpring(260)
+          : withSpring(100),
+      height:
+        buttonVal.value === 3 * SCREEN_HEIGHT
+          ? withSpring(80)
+          : withSpring(100),
     };
   });
 
   const arrowAnimationStyle = useAnimatedStyle(() => {
     return {
       left: 3,
-      opacity: buttonVal.value === 3 * SCREEN_HEIGHT ? withTiming(0) : withTiming(1),
-      transform: [{
-        translateX: buttonVal.value === 3 * SCREEN_HEIGHT ? withTiming(100) : withTiming(0)
-      }]
+      opacity:
+        buttonVal.value === 3 * SCREEN_HEIGHT ? withTiming(0) : withTiming(1),
+      transform: [
+        {
+          translateX:
+            buttonVal.value === 3 * SCREEN_HEIGHT
+              ? withTiming(100)
+              : withTiming(0),
+        },
+      ],
     };
   });
 
   const textAnimationStyle = useAnimatedStyle(() => {
     return {
-      opacity: buttonVal.value === 3 * SCREEN_HEIGHT ? withTiming(1) : withTiming(0),
-      transform: [{
-        translateX: buttonVal.value === 3 * SCREEN_HEIGHT ? withTiming(0) : withTiming(-100)
-      }]
+      opacity:
+        buttonVal.value === 3 * SCREEN_HEIGHT ? withTiming(1) : withTiming(0),
+      transform: [
+        {
+          translateX:
+            buttonVal.value === 3 * SCREEN_HEIGHT
+              ? withTiming(0)
+              : withTiming(-100),
+        },
+      ],
     };
   });
 
   return (
     <TouchableWithoutFeedback onPress={handlePress}>
       <Animated.View
-        style={[styles.container, animatedColor, buttonAnimationStyle]}>
+        style={[styles.container, animatedColor, buttonAnimationStyle]}
+      >
         <Animated.Text style={[styles.textButton, textAnimationStyle]}>
           Ayo Mulai
         </Animated.Text>
@@ -59,7 +88,7 @@ export default function CustomButton({ handlePress, buttonVal }: Props) {
       </Animated.View>
     </TouchableWithoutFeedback>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -68,12 +97,12 @@ const styles = StyleSheet.create({
     zIndex: 1,
     borderRadius: 100,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   textButton: {
     color: "black",
     fontSize: 18,
     position: "absolute",
     fontFamily: "Montserrat-ExtraBold",
-  }
+  },
 });

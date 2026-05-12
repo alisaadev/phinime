@@ -8,7 +8,7 @@ const colors = {
 
   text: "#FFFFFF",
   textSecondary: "#C4C4C4",
-  textDark: "#888888"
+  textDark: "#888888",
 };
 
 export default colors;

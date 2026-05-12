@@ -1,11 +1,10 @@
 import { useEffect } from "react";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack, useRouter } from "expo-router";
+import { SplashScreen, Stack } from "expo-router";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const router = useRouter();
   const [loaded] = useFonts({
     "Montserrat-Regular": require("@/fonts/Montserrat-Regular.ttf"),
     "Montserrat-Medium": require("@/fonts/Montserrat-Medium.ttf"),
@@ -21,9 +20,11 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <Stack screenOptions={{
-      headerShown: false,
-      animation: "slide_from_right"
-    }} />
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        animation: "slide_from_right",
+      }}
+    />
   );
 }

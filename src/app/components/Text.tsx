@@ -1,6 +1,6 @@
 import { Text as RNText, TextProps, StyleSheet } from "react-native";
 
-import fontMap from "@/constants/fonts"
+import fontMap from "@/constants/fonts";
 
 export default function Text({ style, ...props }: TextProps) {
   const flat = StyleSheet.flatten(style);
@@ -8,10 +8,5 @@ export default function Text({ style, ...props }: TextProps) {
   const fontFamily = fontMap[weight] ?? "Montserrat-Regular";
   const { fontWeight, ...restStyle } = flat ?? {};
 
-  return (
-    <RNText
-      style={[restStyle, { fontFamily }]}
-      {...props}
-    />
-  );
+  return <RNText style={[restStyle, { fontFamily }]} {...props} />;
 }

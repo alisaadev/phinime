@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { FontAwesome } from "@expo/vector-icons";
-import { View, StyleSheet, Pressable } from "react-native";
+import { View, StyleSheet, Pressable, ToastAndroid } from "react-native";
 
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import Loader from "@/components/Loader";
 import Button from "@/components/Button";
+import { signInWithGoogle } from "@/services/auth";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -15,12 +15,19 @@ export default function LoginScreen() {
 
   const handleGoogle = async () => {
     setLoading(true);
+    const result = await signInWithGoogle();
     setLoading(false);
-  };
 
-  const handleGithub = async () => {
-    setLoading(true);
-    setLoading(false);
+    if (result.success) {
+      router.replace("/onboarded/(tabs)");
+      ToastAndroid.show(
+        "Berhasil Login dengan Akun " + result.user.email,
+        ToastAndroid.SHORT,
+      );
+    } else {
+      ToastAndroid.show(result.error, ToastAndroid.SHORT);
+      console.error(result.error);
+    }
   };
 
   return (
@@ -35,20 +42,11 @@ export default function LoginScreen() {
           onPress={handleGoogle}
         >
           <Image
-            source={ require("@/images/GoogleIcon.png") }
+            source={require("@/images/GoogleIcon.png")}
             style={styles.googleIcon}
             contentFit="cover"
-           />
+          />
           <Text style={styles.googleText}>Sign in with Google</Text>
-        </Button>
-
-        <Button
-          button={styles.githubButton}
-          wrapper={styles.containerButton}
-          onPress={handleGithub}
-        >
-          <FontAwesome name="github" size={24} color="white" />
-          <Text style={styles.githubText}>Sign in with GitHub</Text>
         </Button>
 
         <Text style={styles.privacyNote}>
@@ -97,7 +95,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 13,
     color: colors.textDark,
-    marginBottom: 28,
+    marginBottom: 22,
     fontWeight: "500",
   },
   googleIcon: {
@@ -108,25 +106,11 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 52,
     gap: 10,
-    marginBottom: 12,
+    marginBottom: 24,
   },
   googleText: {
     right: 12,
     color: "#3c3c3c",
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  githubButton: {
-    width: "100%",
-    height: 52,
-    backgroundColor: "#24292e",
-    gap: 10,
-    marginBottom: 24,
-    borderWidth: 0.8,
-    borderColor: "rgba(255,255,255,0.15)",
-  },
-  githubText: {
-    color: "white",
     fontSize: 15,
     fontWeight: "600",
   },
@@ -140,5 +124,5 @@ const styles = StyleSheet.create({
     color: colors.accent,
     fontSize: 13,
     fontWeight: "600",
-  }
+  },
 });

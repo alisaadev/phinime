@@ -44,7 +44,7 @@ export async function setCache<T>(cacheKey: string, data: T): Promise<void> {
       created_at: now.toISOString(),
       expires_at: expiresAt,
     },
-    { onConflict: "cache_key" }
+    { onConflict: "cache_key" },
   );
 
   if (error) {
@@ -85,7 +85,7 @@ export async function cleanExpiredCache(): Promise<void> {
  */
 export async function cacheOrFetch<T>(
   cacheKey: string,
-  fetcher: () => Promise<T>
+  fetcher: () => Promise<T>,
 ): Promise<T> {
   // 1. Cek cache
   const cached = await getCache<T>(cacheKey);
@@ -114,13 +114,11 @@ export async function cacheOrFetch<T>(
  */
 export async function saveSearchHistory(
   userId: string,
-  query: string
+  query: string,
 ): Promise<void> {
   if (!query.trim()) return;
 
-  const tenMinutesAgo = new Date(
-    Date.now() - CACHE_DURATION_MS
-  ).toISOString();
+  const tenMinutesAgo = new Date(Date.now() - CACHE_DURATION_MS).toISOString();
 
   // Cek apakah query yang sama sudah disimpan dalam 10 menit terakhir
   const { data: existing } = await supabase
@@ -144,7 +142,7 @@ export async function saveSearchHistory(
  */
 export async function getSearchHistory(
   userId: string,
-  limit = 10
+  limit = 10,
 ): Promise<string[]> {
   const { data, error } = await supabase
     .from("user_search_history")
@@ -161,10 +159,7 @@ export async function getSearchHistory(
  * Hapus semua history search user.
  */
 export async function clearSearchHistory(userId: string): Promise<void> {
-  await supabase
-    .from("user_search_history")
-    .delete()
-    .eq("user_id", userId);
+  await supabase.from("user_search_history").delete().eq("user_id", userId);
 }
 
 /**
@@ -172,7 +167,7 @@ export async function clearSearchHistory(userId: string): Promise<void> {
  */
 export async function deleteSearchHistoryItem(
   userId: string,
-  query: string
+  query: string,
 ): Promise<void> {
   await supabase
     .from("user_search_history")

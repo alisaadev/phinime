@@ -1,7 +1,14 @@
 import { useRouter } from "expo-router";
 import { useState, useRef } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { View, StyleSheet, Animated, TouchableOpacity, ToastAndroid, Keyboard } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Animated,
+  TouchableOpacity,
+  ToastAndroid,
+  Keyboard,
+} from "react-native";
 
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
@@ -77,7 +84,10 @@ export default function HomeHeader({ scrollY }: Props) {
 
   const handleSearch = () => {
     if (!query.trim()) {
-      ToastAndroid.show("Anime apa yang ingin kamu cari?...", ToastAndroid.SHORT);
+      ToastAndroid.show(
+        "Anime apa yang ingin kamu cari?...",
+        ToastAndroid.SHORT,
+      );
     } else {
       router.push(`search/${query.trim()}`);
     }
@@ -86,19 +96,30 @@ export default function HomeHeader({ scrollY }: Props) {
   return (
     <Animated.View style={[styles.header, { backgroundColor }]}>
       <Animated.View style={[styles.pill, { width: animatedWidth }]}>
-
         <Animated.View
-          style={[StyleSheet.absoluteFill, styles.pillContent, { opacity: textOpacity }]}
+          style={[
+            StyleSheet.absoluteFill,
+            styles.pillContent,
+            { opacity: textOpacity },
+          ]}
           pointerEvents={searchOpen ? "none" : "auto"}
         >
-          <Text style={styles.logo}>Phinime</Text>
+          <Text style={styles.logo}>phinime</Text>
         </Animated.View>
 
         <Animated.View
-          style={[StyleSheet.absoluteFill, styles.pillContent, { opacity: inputOpacity }]}
+          style={[
+            StyleSheet.absoluteFill,
+            styles.pillContent,
+            { opacity: inputOpacity },
+          ]}
           pointerEvents={searchOpen ? "auto" : "none"}
         >
-          <Ionicons name="search-outline" size={14} color="rgba(255,255,255,0.5)" />
+          <Ionicons
+            name="search-outline"
+            size={14}
+            color="rgba(255,255,255,0.5)"
+          />
           <TextInput
             ref={inputRef}
             style={styles.searchInput}
@@ -111,7 +132,11 @@ export default function HomeHeader({ scrollY }: Props) {
           />
           {query.length > 0 && (
             <TouchableOpacity onPress={() => setQuery("")}>
-              <Ionicons name="close-circle" size={14} color="rgba(255,255,255,0.4)" />
+              <Ionicons
+                name="close-circle"
+                size={14}
+                color="rgba(255,255,255,0.4)"
+              />
             </TouchableOpacity>
           )}
         </Animated.View>

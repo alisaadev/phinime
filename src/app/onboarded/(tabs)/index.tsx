@@ -16,7 +16,6 @@ export default function Page() {
       <SafeAreaView style={styles.safeAreaView}>
         <StatusBar style="light" />
         <View style={styles.container}>
-
           <View style={[styles.contentArea, activeTab !== 0 && styles.hidden]}>
             <Home />
           </View>
@@ -43,22 +42,22 @@ export default function Page() {
 const styles = StyleSheet.create({
   safeAreaView: {
     flex: 1,
-    backgroundColor: colors.background
+    backgroundColor: colors.background,
   },
   container: {
-    flex: 1
+    flex: 1,
   },
   contentArea: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   hidden: {
-    display: "none"
+    display: "none",
   },
   contentText: {
     fontSize: 20,
     fontWeight: "600",
-    color: colors.text
-  }
+    color: colors.text,
+  },
 });

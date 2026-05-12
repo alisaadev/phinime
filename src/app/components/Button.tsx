@@ -1,5 +1,13 @@
 import { useRef, ReactNode } from "react";
-import { Pressable, StyleSheet, Animated, GestureResponderEvent, ViewStyle, TextStyle, StyleProp } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Animated,
+  GestureResponderEvent,
+  ViewStyle,
+  TextStyle,
+  StyleProp,
+} from "react-native";
 
 import Text from "@/components/Text";
 
@@ -13,7 +21,14 @@ type ButtonProps = {
   wrapper?: StyleProp<ViewStyle>;
 };
 
-export default function Button({ title, children, onPress, button, text, wrapper }: ButtonProps) {
+export default function Button({
+  title,
+  children,
+  onPress,
+  button,
+  text,
+  wrapper,
+}: ButtonProps) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
@@ -21,7 +36,7 @@ export default function Button({ title, children, onPress, button, text, wrapper
       toValue: 0.94,
       useNativeDriver: true,
       speed: 40,
-      bounciness: 6
+      bounciness: 6,
     }).start();
   };
 
@@ -30,7 +45,7 @@ export default function Button({ title, children, onPress, button, text, wrapper
       toValue: 1,
       useNativeDriver: true,
       speed: 35,
-      bounciness: 8
+      bounciness: 8,
     }).start();
   };
 
@@ -40,8 +55,8 @@ export default function Button({ title, children, onPress, button, text, wrapper
         styles.wrapperD,
         wrapper,
         {
-          transform: [{ scale: scaleAnim }]
-        }
+          transform: [{ scale: scaleAnim }],
+        },
       ]}
     >
       <Pressable
@@ -53,9 +68,7 @@ export default function Button({ title, children, onPress, button, text, wrapper
         {children ? (
           children
         ) : (
-          <Text style={[styles.textD, text]}>
-            {title}
-          </Text>
+          <Text style={[styles.textD, text]}>{title}</Text>
         )}
       </Pressable>
     </Animated.View>
@@ -64,7 +77,7 @@ export default function Button({ title, children, onPress, button, text, wrapper
 
 const styles = StyleSheet.create({
   wrapperD: {
-    borderRadius: 999
+    borderRadius: 999,
   },
   buttonD: {
     backgroundColor: "#ffffff",
@@ -73,10 +86,10 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   textD: {
     color: "#000",
-    fontSize: 16
-  }
+    fontSize: 16,
+  },
 });

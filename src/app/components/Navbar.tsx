@@ -1,6 +1,12 @@
 import { useRef, useEffect, useState } from "react";
 import { Ionicons, MaterialCommunityIcons, Feather } from "@expo/vector-icons";
-import { View, TouchableOpacity, StyleSheet, Animated, LayoutChangeEvent } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  Animated,
+  LayoutChangeEvent,
+} from "react-native";
 
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
@@ -17,8 +23,12 @@ export default function Navbar({ selectedIndex, onSelect }: any) {
   const slide = useRef(new Animated.Value(0)).current;
   const itemWidth = navWidth / ITEMS.length;
 
-  const scales = useRef(ITEMS.map((_, i) => new Animated.Value(i === 0 ? 1.1 : 1))).current;
-  const glows = useRef(ITEMS.map((_, i) => new Animated.Value(i === 0 ? 1 : 0))).current;
+  const scales = useRef(
+    ITEMS.map((_, i) => new Animated.Value(i === 0 ? 1.1 : 1)),
+  ).current;
+  const glows = useRef(
+    ITEMS.map((_, i) => new Animated.Value(i === 0 ? 1 : 0)),
+  ).current;
 
   useEffect(() => {
     if (!itemWidth) return;
@@ -59,7 +69,13 @@ export default function Navbar({ selectedIndex, onSelect }: any) {
         case "ion":
           return <Ionicons name={item.icon} size={size} color={color} />;
         case "mc":
-          return <MaterialCommunityIcons name={item.icon} size={size} color={color} />;
+          return (
+            <MaterialCommunityIcons
+              name={item.icon}
+              size={size}
+              color={color}
+            />
+          );
         default:
           return <Feather name={item.icon} size={size} color={color} />;
       }
@@ -71,7 +87,6 @@ export default function Navbar({ selectedIndex, onSelect }: any) {
   return (
     <View style={styles.wrapper}>
       <View style={styles.container} onLayout={onLayout}>
-
         {navWidth > 0 && (
           <Animated.View
             style={[
@@ -119,7 +134,7 @@ const styles = StyleSheet.create({
     bottom: 15,
     width: "100%",
     alignItems: "center",
-    zIndex: 99
+    zIndex: 99,
   },
   container: {
     width: "88%",
@@ -135,7 +150,7 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     shadowOffset: { width: 0, height: 8 },
     elevation: 12,
-    overflow: "visible"
+    overflow: "visible",
   },
   activeBubble: {
     position: "absolute",
@@ -149,7 +164,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
-    elevation: 8
+    elevation: 8,
   },
   item: {
     flex: 1,
@@ -157,20 +172,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 4,
     zIndex: 2,
-    height: "100%"
+    height: "100%",
   },
   iconWrapper: {
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   label: {
     color: "rgba(255,255,255,0.45)",
     fontSize: 8,
-    fontWeight: "500"
+    fontWeight: "500",
   },
   activeLabel: {
     color: colors.accent,
     fontSize: 8,
-    fontWeight: "700"
-  }
+    fontWeight: "700",
+  },
 });

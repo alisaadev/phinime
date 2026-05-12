@@ -27,6 +27,12 @@
     ],
     "ios": {
       "bundleIdentifier": "com.phinime"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e7654b11-0125-4a5b-8494-4fddfbdf7204"
+      }
     }
   }
 }

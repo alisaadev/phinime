@@ -1,4 +1,8 @@
-import { TextInput as RNTextInput, TextInputProps, StyleSheet } from "react-native";
+import {
+  TextInput as RNTextInput,
+  TextInputProps,
+  StyleSheet,
+} from "react-native";
 
 import fontMap from "@/constants/fonts";
 
@@ -8,10 +12,5 @@ export default function TextInput({ style, ...props }: TextInputProps) {
   const fontFamily = fontMap[weight] ?? "Montserrat-Regular";
   const { fontWeight, ...restStyle } = flat ?? {};
 
-  return (
-    <RNTextInput
-      style={[restStyle, { fontFamily }]}
-      {...props}
-    />
-  );
+  return <RNTextInput style={[restStyle, { fontFamily }]} {...props} />;
 }

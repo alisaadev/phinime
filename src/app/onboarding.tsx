@@ -2,8 +2,21 @@ import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import { useSharedValue, withTiming } from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { PixelRatio, StyleSheet, View, useWindowDimensions } from "react-native";
-import { Canvas, Circle, Group, Image, Mask, SkImage, makeImageFromView } from "@shopify/react-native-skia";
+import {
+  PixelRatio,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+} from "react-native";
+import {
+  Canvas,
+  Circle,
+  Group,
+  Image,
+  Mask,
+  SkImage,
+  makeImageFromView,
+} from "@shopify/react-native-skia";
 
 import data from "@/constants/onboarding";
 import Pagination from "@/onboarded/Pagination";
@@ -20,7 +33,8 @@ export default function OnboardingScreen() {
   const [overlay, setOverlay] = useState<SkImage | null>(null);
   const mask = useSharedValue(0);
   const buttonVal = useSharedValue(0);
-  const wait = async (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+  const wait = async (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
 
   const handlePress = async () => {
     if (currentIndex === data.length - 1 && !active) {
@@ -36,8 +50,8 @@ export default function OnboardingScreen() {
       setOverlay(snapshot1);
       await wait(80);
 
-      setCurrentIndex(prev => prev + 1);
-      mask.value = withTiming(SCREEN_HEIGHT, {duration: 1000});
+      setCurrentIndex((prev) => prev + 1);
+      mask.value = withTiming(SCREEN_HEIGHT, { duration: 1000 });
       buttonVal.value = withTiming(buttonVal.value + SCREEN_HEIGHT);
       await wait(1000);
 
@@ -77,7 +91,8 @@ export default function OnboardingScreen() {
                   color="black"
                 />
               </Group>
-            }>
+            }
+          >
             <Image
               image={overlay}
               x={0}
@@ -93,11 +108,11 @@ export default function OnboardingScreen() {
       <Pagination data={data} buttonVal={buttonVal} />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center"
-  }
+    alignItems: "center",
+  },
 });

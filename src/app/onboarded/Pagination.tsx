@@ -1,5 +1,11 @@
 import { StyleSheet, useWindowDimensions, View } from "react-native";
-import Animated, { Extrapolation, SharedValue, interpolate, interpolateColor, useAnimatedStyle } from "react-native-reanimated";
+import Animated, {
+  Extrapolation,
+  SharedValue,
+  interpolate,
+  interpolateColor,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 
 import { OnBoardingData } from "@/constants/onboarding";
 
@@ -25,7 +31,7 @@ function Dot({ index, buttonVal }: DotProps) {
         (index + 1) * SCREEN_HEIGHT,
       ],
       [10, 30, 10],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
 
     const opacityAnimation = interpolate(
@@ -36,12 +42,12 @@ function Dot({ index, buttonVal }: DotProps) {
         (index + 1) * SCREEN_HEIGHT,
       ],
       [0.5, 1, 0.5],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
 
     return {
       width: widthAnimation,
-      opacity: opacityAnimation
+      opacity: opacityAnimation,
     };
   });
 
@@ -49,7 +55,7 @@ function Dot({ index, buttonVal }: DotProps) {
     const backgroundColor = interpolateColor(
       buttonVal.value,
       [0, SCREEN_HEIGHT, 2 * SCREEN_HEIGHT, 3 * SCREEN_HEIGHT],
-      ["#F2C4CE", "#C9B8D4", "#A8C8D8", "#EDE8F0"]
+      ["#F2C4CE", "#C9B8D4", "#A8C8D8", "#EDE8F0"],
     );
 
     return { backgroundColor };
@@ -58,7 +64,7 @@ function Dot({ index, buttonVal }: DotProps) {
   return (
     <Animated.View style={[styles.dots, animatedDotStyle, animatedColor]} />
   );
-};
+}
 
 export default function Pagination({ data, buttonVal }: PaginationProps) {
   return (
@@ -68,17 +74,17 @@ export default function Pagination({ data, buttonVal }: PaginationProps) {
       })}
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   paginationContainer: {
     flexDirection: "row",
     position: "absolute",
-    bottom: 50
+    bottom: 50,
   },
   dots: {
     height: 10,
     marginHorizontal: 5,
-    borderRadius: 5
-  }
+    borderRadius: 5,
+  },
 });

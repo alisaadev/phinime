@@ -16,6 +16,7 @@
     "expo": "~55.0.23",
     "expo-blur": "~55.0.14",
     "expo-constants": "~55.0.15",
+    "expo-dev-client": "~55.0.32",
     "expo-font": "~55.0.7",
     "expo-image": "~55.0.10",
     "expo-linear-gradient": "~55.0.13",
@@ -23,7 +24,6 @@
     "expo-router": "~55.0.14",
     "expo-status-bar": "~55.0.6",
     "expo-system-ui": "~55.0.17",
-    "expo-web-browser": "~55.0.15",
     "lottie-react-native": "~7.3.1",
     "react": "19.2.0",
     "react-native": "^0.83.6",
@@ -34,7 +34,16 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.10",
+    "prettier": "3.8.3",
     "typescript": "~5.9.2"
   },
+  "expo": {
+    "install": {
+      "exclude": [
+        "react"
+      ]
+    }
+  },
+  "npmrc": "legacy-peer-deps=true",
   "private": true
 }

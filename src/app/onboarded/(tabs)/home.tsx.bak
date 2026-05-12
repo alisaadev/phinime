@@ -36,6 +36,6 @@ const styles = StyleSheet.create({
   },
   barrier: {
     width: "100%",
-    marginBottom: 14,
-  },
+    marginBottom: 10
+  }
 });

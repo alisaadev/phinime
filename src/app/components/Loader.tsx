@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.45)",
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 99
+    zIndex: 99,
   },
   glassContainer: {
     width: 60,
@@ -38,6 +38,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     backgroundColor: "rgba(255,255,255,0.08)",
     borderWidth: 0.8,
-    borderColor: "rgba(255,255,255,0.2)"
-  }
+    borderColor: "rgba(255,255,255,0.2)",
+  },
 });

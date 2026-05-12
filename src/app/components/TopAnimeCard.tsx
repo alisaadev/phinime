@@ -2,7 +2,16 @@ import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { useRef, useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import { View, StyleSheet, FlatList, Dimensions, TouchableOpacity, NativeSyntheticEvent, NativeScrollEvent, Animated } from "react-native";
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  Dimensions,
+  TouchableOpacity,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+  Animated,
+} from "react-native";
 
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
@@ -13,8 +22,6 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_WIDTH = SCREEN_WIDTH - 48;
 const CARD_HEIGHT = 180;
 const CARD_GAP = 16;
-
-let cachedAnimeList: Top10Item[] = [];
 
 function Dot({ active }: { active: boolean }) {
   const width = useRef(new Animated.Value(active ? 20 : 6)).current;
@@ -51,18 +58,15 @@ function Dot({ active }: { active: boolean }) {
 
 export default function TopAnimeCard() {
   const flatListRef = useRef<FlatList>(null);
-  const [animeList, setAnimeList] = useState<Top10Item[]>(cachedAnimeList);
+  const [animeList, setAnimeList] = useState<Top10Item[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (cachedAnimeList.length > 0) return;
-
     const fetchData = async () => {
       try {
         const { top10 } = await getHome();
-        cachedAnimeList = top10.animeList;
         setAnimeList(top10.animeList);
       } catch (err) {
         console.error("[TopAnimeCard] Gagal fetch:", err);
@@ -89,14 +93,31 @@ export default function TopAnimeCard() {
 
   const onScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const index = Math.round(
-      e.nativeEvent.contentOffset.x / (CARD_WIDTH + CARD_GAP)
+      e.nativeEvent.contentOffset.x / (CARD_WIDTH + CARD_GAP),
     );
     setActiveIndex(index);
   };
 
   if (animeList.length === 0) {
     return (
-      <View style={styles.skeletonCard} />
+      <View style={styles.skeletonWrapper}>
+        <View style={styles.skeletonCard}>
+          <View style={styles.skeletonPoster} />
+
+          <View style={styles.skeletonContent}>
+            <View style={styles.skeletonRank} />
+            <View style={styles.skeletonTitle} />
+            <View style={styles.skeletonTitleShort} />
+            <View style={styles.skeletonButton} />
+          </View>
+        </View>
+
+        <View style={styles.skeletonDots}>
+          {[...Array(5)].map((_, i) => (
+            <View key={i} style={styles.skeletonDot} />
+          ))}
+        </View>
+      </View>
     );
   }
 
@@ -187,60 +208,60 @@ export default function TopAnimeCard() {
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginTop: 56
+    marginTop: 56,
   },
   listContent: {
     paddingHorizontal: 24,
-    gap: CARD_GAP
+    gap: CARD_GAP,
   },
   card: {
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
     borderRadius: 20,
     overflow: "hidden",
-    backgroundColor: colors.secondary
+    backgroundColor: colors.secondary,
   },
   poster: {
     position: "absolute",
     right: 0,
     top: 0,
     bottom: 0,
-    width: "58%"
+    width: "58%",
   },
   content: {
     flex: 1,
     padding: 18,
     justifyContent: "space-between",
     zIndex: 2,
-    width: "65%"
+    width: "65%",
   },
   topRow: {
     flexDirection: "row",
     alignItems: "flex-start",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   bottomRow: {
     width: "85%",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   rankContainer: {
     flexDirection: "row",
     alignItems: "flex-end",
-    gap: 1
+    gap: 1,
   },
   rankHash: {
     color: colors.accent,
     fontSize: 13,
     fontWeight: "700",
-    lineHeight: 30
+    lineHeight: 30,
   },
   rankNumber: {
     color: colors.accent,
     fontSize: 30,
     fontWeight: "800",
-    lineHeight: 32
+    lineHeight: 32,
   },
   spotlight: {
     color: "rgba(255,255,255,0.35)",
@@ -248,7 +269,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 1.5,
     marginBottom: 4,
-    marginLeft: 4
+    marginLeft: 4,
   },
   scoreBadge: {
     flexDirection: "row",
@@ -259,15 +280,15 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 8,
     paddingVertical: 3,
-    gap: 3
+    gap: 3,
   },
   scoreStar: {
-    fontSize: 10
+    fontSize: 10,
   },
   scoreText: {
     color: colors.accent,
     fontSize: 11,
-    fontWeight: "700"
+    fontWeight: "700",
   },
   title: {
     color: colors.text,
@@ -276,7 +297,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     textShadowColor: "rgba(0,0,0,0.5)",
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4
+    textShadowRadius: 4,
   },
   watchButton: {
     flexDirection: "row",
@@ -286,7 +307,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 7,
     paddingHorizontal: 12,
-    gap: 6
+    gap: 6,
   },
   playIconWrapper: {
     width: 16,
@@ -294,23 +315,80 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "white",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   watchText: {
     color: "white",
     fontSize: 11,
-    fontWeight: "700"
+    fontWeight: "700",
+  },
+  skeletonWrapper: {
+    marginTop: 56,
+    paddingHorizontal: 24,
   },
   skeletonCard: {
+    width: CARD_WIDTH,
     height: CARD_HEIGHT,
     borderRadius: 20,
     backgroundColor: colors.secondary,
-    marginHorizontal: 24
+    overflow: "hidden",
+    flexDirection: "row",
+  },
+  skeletonPoster: {
+    position: "absolute",
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: "58%",
+    backgroundColor: "rgba(255,255,255,0.06)",
+  },
+  skeletonContent: {
+    padding: 18,
+    justifyContent: "space-between",
+    width: "65%",
+  },
+  skeletonRank: {
+    width: 60,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: "rgba(255,255,255,0.08)",
+  },
+  skeletonTitle: {
+    width: "90%",
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    marginBottom: 8,
+  },
+  skeletonTitleShort: {
+    width: "60%",
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: "rgba(255,255,255,0.08)",
+  },
+  skeletonButton: {
+    width: 90,
+    height: 32,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.08)",
+  },
+  skeletonDots: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 14,
+    gap: 6,
+  },
+  skeletonDot: {
+    width: 6,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: "rgba(255,255,255,0.15)",
   },
   dots: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 14
-  }
+    marginTop: 14,
+  },
 });
