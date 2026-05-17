@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   header: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     marginBottom: 12,
   },
   sectionTitle: {
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
   listContent: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     gap: 10,
   },
   chip: {
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   },
   skeletonRow: {
     flexDirection: "row",
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     gap: 10,
   },
   skeletonChip: {

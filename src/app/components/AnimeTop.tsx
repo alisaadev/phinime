@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Play } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRef, useEffect, useState, memo, useCallback } from "react";
 import {
@@ -20,7 +20,7 @@ import Button from "@/components/Button";
 import { getHome, Top10Item } from "@/services/api2";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const CARD_WIDTH = SCREEN_WIDTH - 48;
+const CARD_WIDTH = SCREEN_WIDTH - 32;
 const CARD_HEIGHT = 180;
 const CARD_GAP = 10;
 
@@ -98,7 +98,7 @@ const AnimeCard = memo(({ item, index, onPress }: AnimeCardProps) => (
       <View style={styles.bottomRow}>
         <Button button={styles.watchButton} onPress={onPress}>
           <View style={styles.playIconWrapper}>
-            <Ionicons name="play" size={9} color={colors.background} />
+            <Play fill={colors.accent} size={12} color={colors.accent} />
           </View>
           <Text style={styles.watchText}>Tonton</Text>
         </Button>
@@ -234,7 +234,6 @@ export default function AnimeTop() {
         removeClippedSubviews
         initialNumToRender={3}
         maxToRenderPerBatch={3}
-        windowSize={5}
       />
 
       <View style={styles.dots}>
@@ -251,7 +250,7 @@ const styles = StyleSheet.create({
     marginTop: 56,
   },
   listContent: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     gap: CARD_GAP,
   },
   card: {

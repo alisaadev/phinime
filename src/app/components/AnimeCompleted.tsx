@@ -1,9 +1,9 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState, memo, useCallback } from "react";
 import { TouchableOpacity, StyleSheet, View, Dimensions } from "react-native";
 
+import Icon from "@/components/Icon";
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import Loader from "@/components/Loader";
@@ -76,7 +76,7 @@ const AnimeCard = memo(({ item, onPress }: AnimeCardProps) => {
         <View style={styles.studioRow}>
           {!!studios && <Text style={styles.studio}>{studios}</Text>}
           {!!studios && !!score && <Text style={styles.dot}>{"•"}</Text>}
-          {!!score && <Text style={styles.score}>{score}</Text>}
+          {!!score && <Text style={styles.score}>⭐ {score}</Text>}
         </View>
 
         {!!synopsis && (
@@ -146,7 +146,7 @@ export default function AnimeCompleted() {
           activeOpacity={0.8}
         >
           <Text style={styles.completedBtnText}>Lihat semua</Text>
-          <Ionicons name="chevron-forward" size={14} color={colors.accent} />
+          <Icon name="ChevronRight" size={14} color={colors.accent} />
         </TouchableOpacity>
       </View>
 
@@ -169,7 +169,7 @@ export default function AnimeCompleted() {
 const styles = StyleSheet.create({
   wrapper: {
     marginTop: 8,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
   },
   header: {
     flexDirection: "row",
@@ -251,20 +251,20 @@ const styles = StyleSheet.create({
   studio: {
     fontSize: 10,
     fontWeight: "500",
-    color: colors.text,
+    color: colors.textSecondary,
   },
   dot: {
     fontSize: 12,
-    color: colors.text,
+    color: colors.textSecondary,
   },
   score: {
     fontSize: 10,
     fontWeight: "600",
-    color: colors.text,
+    color: colors.textSecondary,
   },
   synopsis: {
     fontSize: 8,
-    color: colors.text,
+    color: colors.textSecondary,
     lineHeight: 17,
   },
   skeletonRow: {

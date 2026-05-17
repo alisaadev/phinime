@@ -1,6 +1,5 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState, memo, useCallback } from "react";
 import {
   View,
@@ -10,6 +9,7 @@ import {
   Dimensions,
 } from "react-native";
 
+import Icon from "@/components/Icon";
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import Loader from "@/components/Loader";
@@ -92,7 +92,7 @@ export default function AnimeRecent() {
           activeOpacity={0.8}
         >
           <Text style={styles.scheduleBtnText}>Lihat Jadwal</Text>
-          <Ionicons name="chevron-forward" size={14} color={colors.accent} />
+          <Icon name="ChevronRight" size={14} color={colors.accent} />
         </TouchableOpacity>
       </View>
 
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     marginBottom: 12,
   },
   sectionTitle: {
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   listContent: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     gap: 12,
   },
   card: {

@@ -1,7 +1,5 @@
-import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 import { useState, useRef } from "react";
-import { Ionicons } from "@expo/vector-icons";
 import {
   View,
   StyleSheet,
@@ -11,6 +9,7 @@ import {
   Keyboard,
 } from "react-native";
 
+import Icon from "@/components/Icon";
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import TextInput from "@/components/TextInput";
@@ -29,15 +28,15 @@ export default function HomeHeader({ scrollY }: Props) {
   const textOpacity = useRef(new Animated.Value(1)).current;
   const inputOpacity = useRef(new Animated.Value(0)).current;
 
-  const blurOpacity = scrollY.interpolate({
-    inputRange: [0, 20, 100],
-    outputRange: [0, 0, 1],
-    extrapolate: "clamp",
-  });
-
   const animatedWidth = pillWidth.interpolate({
     inputRange: [0, 1],
     outputRange: ["33%", "85%"],
+  });
+
+  const backgroundColor = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: ["transparent", colors.background],
+    extrapolate: "clamp",
   });
 
   const openSearch = () => {
@@ -95,17 +94,7 @@ export default function HomeHeader({ scrollY }: Props) {
   };
 
   return (
-    <View style={styles.header}>
-      <Animated.View style={[StyleSheet.absoluteFillObject, { opacity: blurOpacity }]}>
-        <BlurView
-          style={StyleSheet.absoluteFillObject}
-          intensity={60}
-          tint="dark"
-          experimentalBlurMethod="dimezisBlurView"
-        />
-        <View style={styles.blurOverlay} />
-      </Animated.View>
-
+    <Animated.View style={[styles.header, { backgroundColor }]}>
       <Animated.View style={[styles.pill, { width: animatedWidth }]}>
         <Animated.View
           style={[
@@ -126,16 +115,16 @@ export default function HomeHeader({ scrollY }: Props) {
           ]}
           pointerEvents={searchOpen ? "auto" : "none"}
         >
-          <Ionicons
-            name="search-outline"
+          <Icon
+            name="Search"
             size={14}
-            color="rgba(255,255,255,0.5)"
+            color={colors.textDark}
           />
           <TextInput
             ref={inputRef}
             style={styles.searchInput}
             placeholder="Cari anime..."
-            placeholderTextColor="rgba(255,255,255,0.35)"
+            placeholderTextColor={colors.textDark}
             value={query}
             onChangeText={setQuery}
             returnKeyType="search"
@@ -143,10 +132,10 @@ export default function HomeHeader({ scrollY }: Props) {
           />
           {query.length > 0 && (
             <TouchableOpacity onPress={() => setQuery("")}>
-              <Ionicons
-                name="close-circle"
+              <Icon
+                name="X"
                 size={14}
-                color="rgba(255,255,255,0.4)"
+                color={colors.textDark}
               />
             </TouchableOpacity>
           )}
@@ -156,15 +145,15 @@ export default function HomeHeader({ scrollY }: Props) {
       <TouchableOpacity
         onPress={searchOpen ? closeSearch : openSearch}
         style={styles.iconButton}
-        activeOpacity={0.7}
+        activeOpacity={0.8}
       >
-        <Ionicons
-          name={searchOpen ? "close-outline" : "search-outline"}
+        <Icon
+          name={searchOpen ? "X" : "Search"}
           size={22}
           color={colors.text}
         />
       </TouchableOpacity>
-    </View>
+    </Animated.View>
   );
 }
 
@@ -178,11 +167,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 10,
-  },
-  blurOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.25)",
+    paddingHorizontal: 12,
   },
   pill: {
     height: 40,

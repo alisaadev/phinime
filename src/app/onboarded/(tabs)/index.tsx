@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { BlurTargetView } from "expo-blur";
 import { StatusBar } from "expo-status-bar";
 import { View, StyleSheet } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -10,28 +11,40 @@ import Home from "@/onboarded/(tabs)/home";
 
 export default function index() {
   const [activeTab, setActiveTab] = useState(0);
+  const blurTargetRef = useRef<View | null>(null);
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeAreaView}>
         <StatusBar style="light" />
         <View style={styles.container}>
-          <View style={[styles.contentArea, activeTab !== 0 && styles.hidden]}>
-            <Home />
-          </View>
-          <View style={[styles.contentArea, activeTab !== 1 && styles.hidden]}>
-            <Text style={styles.contentText}>Halaman Superuser</Text>
-          </View>
-          <View style={[styles.contentArea, activeTab !== 2 && styles.hidden]}>
-            <Text style={styles.contentText}>Halaman Modul</Text>
-          </View>
-          <View style={[styles.contentArea, activeTab !== 3 && styles.hidden]}>
-            <Text style={styles.contentText}>Halaman Setelan</Text>
-          </View>
+          <BlurTargetView ref={blurTargetRef} style={styles.blurTarget}>
+            <View
+              style={[styles.contentArea, activeTab !== 0 && styles.hidden]}
+            >
+              <Home />
+            </View>
+            <View
+              style={[styles.contentArea, activeTab !== 1 && styles.hidden]}
+            >
+              <Text style={styles.contentText}>Halaman Superuser</Text>
+            </View>
+            <View
+              style={[styles.contentArea, activeTab !== 2 && styles.hidden]}
+            >
+              <Text style={styles.contentText}>Halaman Modul</Text>
+            </View>
+            <View
+              style={[styles.contentArea, activeTab !== 3 && styles.hidden]}
+            >
+              <Text style={styles.contentText}>Halaman Setelan</Text>
+            </View>
+          </BlurTargetView>
 
           <Navbar
             selectedIndex={activeTab}
             onSelect={(index: number) => setActiveTab(index)}
+            blurTargetRef={blurTargetRef}
           />
         </View>
       </SafeAreaView>
@@ -45,6 +58,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   container: {
+    flex: 1,
+  },
+  blurTarget: {
     flex: 1,
   },
   contentArea: {

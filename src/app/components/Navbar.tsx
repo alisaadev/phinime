@@ -1,3 +1,4 @@
+import { BlurView } from "expo-blur";
 import { useRef, useEffect, useState } from "react";
 import {
   View,
@@ -12,13 +13,23 @@ import Text from "@/components/Text";
 import colors from "@/constants/colors";
 
 const ITEMS = [
-  { label: "Beranda", icon: "House" },
-  { label: "History", icon: "History" },
-  { label: "Bookmark", icon: "Bookmark" },
-  { label: "Profile", icon: "User" },
+  { icon: "House" },
+  { icon: "History" },
+  { icon: "Bookmark" },
+  { icon: "User" },
 ];
 
-export default function Navbar({ selectedIndex, onSelect }: any) {
+interface NavbarProps {
+  selectedIndex: number;
+  onSelect: (index: number) => void;
+  blurTargetRef: React.RefObject<View | null>;
+}
+
+export default function Navbar({
+  selectedIndex,
+  onSelect,
+  blurTargetRef,
+}: NavbarProps) {
   const [navWidth, setNavWidth] = useState(0);
   const slide = useRef(new Animated.Value(0)).current;
   const itemWidth = navWidth / ITEMS.length;
@@ -61,15 +72,21 @@ export default function Navbar({ selectedIndex, onSelect }: any) {
 
   const renderIcon = (item: any, index: number) => {
     const active = selectedIndex === index;
-    const color = active ? colors.accent : "rgba(255,255,255,0.5)";
-    const size = 26;
-
-    return <Icon name={item.icon} size={size} color={color} />;
+    const color = active ? colors.accent : colors.textSecondary;
+    return <Icon name={item.icon} size={26} color={color} />;
   };
 
   return (
     <View style={styles.wrapper}>
       <View style={styles.container} onLayout={onLayout}>
+        <BlurView
+          style={StyleSheet.absoluteFillObject}
+          blurTarget={blurTargetRef}
+          intensity={60}
+          tint="systemUltraThinMaterialDark"
+          blurMethod="dimezisBlurView"
+        />
+
         {navWidth > 0 && (
           <Animated.View
             style={[
@@ -100,9 +117,6 @@ export default function Navbar({ selectedIndex, onSelect }: any) {
               >
                 {renderIcon(item, index)}
               </Animated.View>
-              <Text style={[styles.label, active && styles.activeLabel]}>
-                {item.label}
-              </Text>
             </TouchableOpacity>
           );
         })}
@@ -114,15 +128,14 @@ export default function Navbar({ selectedIndex, onSelect }: any) {
 const styles = StyleSheet.create({
   wrapper: {
     position: "absolute",
-    bottom: 15,
+    bottom: 14,
     width: "100%",
     alignItems: "center",
     zIndex: 99,
   },
   container: {
     width: "88%",
-    height: 72,
-    backgroundColor: "rgba(40,44,64,0.92)",
+    height: 68,
     borderRadius: 40,
     borderWidth: 0.8,
     borderColor: "rgba(255,255,255,0.2)",
@@ -133,14 +146,14 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     shadowOffset: { width: 0, height: 8 },
     elevation: 12,
-    overflow: "visible",
+    overflow: "hidden",
   },
   activeBubble: {
     position: "absolute",
-    height: 65,
-    left: 3,
+    height: 62,
+    left: 2.5,
     borderRadius: 36,
-    backgroundColor: colors.background,
+    backgroundColor: "rgba(26,26,41,0.5)",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.1)",
     shadowColor: "#000",
@@ -160,15 +173,5 @@ const styles = StyleSheet.create({
   iconWrapper: {
     alignItems: "center",
     justifyContent: "center",
-  },
-  label: {
-    color: "rgba(255,255,255,0.45)",
-    fontSize: 8,
-    fontWeight: "500",
-  },
-  activeLabel: {
-    color: colors.accent,
-    fontSize: 8,
-    fontWeight: "700",
   },
 });
