@@ -1,368 +1,356 @@
 // ============================================================
-// services/api.ts — API Service + Cache Terintegrasi
+// Anime API Client - sankavollerei.com
+// Base URL: https://www.sankavollerei.com/anime
+// Integrated with Cache (cache.ts)
 // ============================================================
 
 import { cacheOrFetch, saveSearchHistory } from "@/services/cache";
 
-const BASE_URL = "https://www.sankavollerei.com/anime/samehadaku";
+const BASE_URL = "https://www.sankavollerei.com/anime";
 
-export type ApiResponse<T> = {
-  status: "success" | "error";
+// TYPES
+export interface ApiResponse<T> {
+  status: string;
   creator: string;
+  statusCode: number;
+  statusMessage: string;
   message: string;
+  ok: boolean;
   data: T;
   pagination: Pagination | null;
-};
+}
 
-export type Pagination = {
+export interface Pagination {
   currentPage: number;
   hasPrevPage: boolean;
   prevPage: number | null;
   hasNextPage: boolean;
   nextPage: number | null;
   totalPages: number;
-};
+}
 
-export type Genre = {
+export interface Genre {
   title: string;
   genreId: string;
   href: string;
-  samehadakuUrl: string;
-};
+  otakudesuUrl: string;
+}
 
-export type AnimeListItem = {
+export interface OngoingAnime {
   title: string;
   poster: string;
-  type?: string;
-  score?: string;
-  status?: string;
-  episodes?: string;
-  releasedOn?: string;
-  releaseDate?: string;
-  estimation?: string;
-  genres?: string;
-  animeId: string;
-  href: string;
-  samehadakuUrl: string;
-  genreList?: Genre[];
-};
-
-export type BatchListItem = {
-  title: string;
-  poster: string;
-  type?: string;
-  score?: string;
-  status?: string;
-  batchId: string;
-  href: string;
-  samehadakuUrl: string;
-  genreList?: Genre[];
-};
-
-export type Top10Item = {
-  rank: number;
-  title: string;
-  poster: string;
-  score: string;
-  animeId: string;
-  href: string;
-  samehadakuUrl: string;
-};
-
-export type HomeData = {
-  recent: { href: string; samehadakuUrl: string; animeList: AnimeListItem[] };
-  batch: { href: string; samehadakuUrl: string; batchList: BatchListItem[] };
-  movie: { href: string; samehadakuUrl: string; animeList: AnimeListItem[] };
-  top10: { href: string; samehadakuUrl: string; animeList: Top10Item[] };
-};
-
-export type ScheduleDay = {
-  day: string;
-  animeList: AnimeListItem[];
-};
-
-export type AnimeDetail = {
-  title: string;
-  poster: string;
-  score: { value: string; users: string } | string;
-  japanese?: string;
-  synonyms?: string;
-  english?: string;
-  status: string;
-  type: string;
-  source?: string;
-  duration?: string;
   episodes: number;
-  season?: string;
-  studios?: string;
-  producers?: string;
-  aired?: string;
-  trailer?: string;
-  synopsis: { paragraphs: string[]; connections: any[] };
+  releaseDay: string;
+  latestReleaseDate: string;
+  animeId: string;
+  href: string;
+  otakudesuUrl: string;
+}
+
+export interface CompletedAnime {
+  title: string;
+  poster: string;
+  episodes: number;
+  score: string;
+  lastReleaseDate: string;
+  animeId: string;
+  href: string;
+  otakudesuUrl: string;
+}
+
+export interface HomeData {
+  ongoing: {
+    href: string;
+    otakudesuUrl: string;
+    animeList: OngoingAnime[];
+  };
+  completed: {
+    href: string;
+    otakudesuUrl: string;
+    animeList: CompletedAnime[];
+  };
+}
+
+export interface ScheduleDay {
+  day: string;
+  anime_list: {
+    title: string;
+    slug: string;
+    url: string;
+    poster: string;
+  }[];
+}
+
+export interface EpisodeItem {
+  title: string;
+  eps: number;
+  date: string;
+  episodeId: string;
+  href: string;
+  otakudesuUrl: string;
+}
+
+export interface AnimeDetail {
+  title: string;
+  poster: string;
+  japanese: string;
+  score: string;
+  producers: string;
+  type: string;
+  status: string;
+  episodes: number;
+  duration: string;
+  aired: string;
+  studios: string;
+  batch: string | null;
+  synopsis: {
+    paragraphs: string[];
+    connections: string[];
+  };
   genreList: Genre[];
-  batchList?: {
+  episodeList: EpisodeItem[];
+  recommendedAnimeList: {
     title: string;
-    batchId: string;
+    poster: string;
+    animeId: string;
     href: string;
-    samehadakuUrl: string;
+    otakudesuUrl: string;
   }[];
-  episodeList?: {
-    title: number;
-    episodeId: string;
-    href: string;
-    samehadakuUrl: string;
-  }[];
-};
+}
 
-export type ServerItem = { title: string; serverId: string; href: string };
-export type QualityServer = { title: string; serverList: ServerItem[] };
-export type DownloadUrl = {
-  formats: {
-    title: string;
-    qualities: { title: string; urls: { title: string; url: string }[] }[];
-  }[];
-};
+export interface ServerItem {
+  title: string;
+  serverId: string;
+  href: string;
+}
 
-export type EpisodeDetail = {
+export interface DownloadUrl {
+  title: string;
+  size: string;
+  urls: { title: string; url: string }[];
+}
+
+export interface EpisodeDetail {
   title: string;
   animeId: string;
-  poster: string;
-  releasedOn: string;
+  releaseTime: string;
   defaultStreamingUrl: string;
   hasPrevEpisode: boolean;
   prevEpisode: {
     title: string;
     episodeId: string;
     href: string;
-    samehadakuUrl: string;
+    otakudesuUrl: string;
   } | null;
   hasNextEpisode: boolean;
   nextEpisode: {
     title: string;
     episodeId: string;
     href: string;
-    samehadakuUrl: string;
+    otakudesuUrl: string;
   } | null;
-  synopsis: { paragraphs: string[]; connections: any[] };
-  genreList: Genre[];
-  server: { qualities: QualityServer[] };
-  downloadUrl: DownloadUrl;
-  recommendedEpisodeList: {
-    title: string;
-    poster: string;
-    releaseDate: string;
-    episodeId: string;
-    href: string;
-    samehadakuUrl: string;
-  }[];
-};
+  server: {
+    qualities: {
+      title: string;
+      serverList: ServerItem[];
+    }[];
+  };
+  downloadUrl: {
+    qualities: DownloadUrl[];
+  };
+  info: {
+    credit: string;
+    encoder: string;
+    duration: string;
+    type: string;
+    genreList: Genre[];
+    episodeList: EpisodeItem[];
+  };
+}
 
-export type BatchDetail = {
+export interface BatchData {
   title: string;
   animeId: string;
   poster: string;
-  japanese?: string;
-  synonyms?: string;
-  english?: string;
-  status: string;
+  japanese: string;
   type: string;
-  source?: string;
-  score?: string;
-  duration?: string;
+  score: string;
   episodes: number;
-  season?: string;
-  studios?: string;
-  producers?: string;
-  aired?: string;
-  releasedOn?: string;
-  synopsis: { paragraphs: string[]; connections: any[] };
+  duration: string;
+  studios: string;
+  producers: string;
+  aired: string;
+  credit: string;
   genreList: Genre[];
-  downloadUrl: DownloadUrl;
-  recommendedAnimeList: AnimeListItem[];
-};
+  downloadUrl: {
+    formats: {
+      title: string;
+      qualities: {
+        title: string;
+        size: string;
+        urls: { title: string; url: string }[];
+      }[];
+    }[];
+  };
+}
 
-export type ServerData = { url: string };
+export interface SearchAnime {
+  title: string;
+  poster: string;
+  status: string;
+  score: string;
+  animeId: string;
+  href: string;
+  otakudesuUrl: string;
+  genreList: Genre[];
+}
 
-export type AnimeListGroup = {
-  startWith: string;
-  animeList: {
-    title: string;
-    animeId: string;
-    href: string;
-    samehadakuUrl: string;
-  }[];
-};
+export interface ServerData {
+  url: string;
+}
+
+export interface UnlimitedAnime {
+  title: string;
+  poster: string;
+  animeId: string;
+  href: string;
+  otakudesuUrl: string;
+}
 
 // ============================================================
-// HELPER — Raw fetch ke API
+// HELPER — raw fetch (tanpa cache, dipakai internal saja)
 // ============================================================
+async function fetchApi<T>(path: string): Promise<ApiResponse<T>> {
+  const url = `${BASE_URL}${path}`;
+  const res = await fetch(url);
 
-async function fetchApi<T>(endpoint: string): Promise<T> {
-  const url = `${BASE_URL}${endpoint}`;
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(`API error: ${response.status} ${response.statusText}`);
+  if (!res.ok) {
+    throw new Error(`HTTP Error ${res.status}: ${res.statusText} — ${url}`);
   }
 
-  const json: ApiResponse<T> = await response.json();
+  const json: ApiResponse<T> = await res.json();
 
-  if (json.status !== "success") {
-    throw new Error(`API returned error: ${json.message}`);
+  if (!json.ok) {
+    throw new Error(`API Error: ${json.message || json.statusMessage}`);
   }
 
   return json.data;
 }
 
 // ============================================================
-// ENDPOINTS — Semua pakai cache kecuali server URL
+// ENDPOINTS — semua dibungkus cacheOrFetch
 // ============================================================
 
-/**
- * Home — refresh tiap 10 menit (global cache)
- * Berisi: recent, batch, movie, top10
- */
-export const getHome = () =>
-  cacheOrFetch<HomeData>("home", () => fetchApi<HomeData>("/home"));
+/** GET /anime/home — Halaman utama (ongoing + completed) */
+export async function getHome(): Promise<ApiResponse<HomeData>> {
+  return cacheOrFetch("anime:home", () => fetchApi<HomeData>("/home"));
+}
 
-/**
- * Recent — cache per halaman
- */
-export const getRecent = (page = 1) =>
-  cacheOrFetch<{ animeList: AnimeListItem[] }>(`recent:page:${page}`, () =>
-    fetchApi(`/recent?page=${page}`),
+/** GET /anime/schedule — Jadwal rilis anime per hari */
+export async function getSchedule(): Promise<{
+  status: string;
+  creator: string;
+  data: ScheduleDay[];
+}> {
+  return cacheOrFetch("anime:schedule", async () => {
+    const url = `${BASE_URL}/schedule`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP Error ${res.status}: ${res.statusText}`);
+    return res.json();
+  });
+}
+
+/** GET /anime/genre — Daftar semua genre */
+export async function getGenres(): Promise<
+  ApiResponse<{ genreList: Genre[] }>
+> {
+  return cacheOrFetch("anime:genres", () =>
+    fetchApi<{ genreList: Genre[] }>("/genre"),
   );
+}
 
-/**
- * Search — cache per query + halaman (global)
- * userId opsional: jika diberikan, query disimpan ke history user
- */
-export const searchAnime = async (query: string, page = 1, userId?: string) => {
-  const trimmed = query.trim().toLowerCase();
-  const cacheKey = `search:${trimmed}:page:${page}`;
-
-  const result = await cacheOrFetch<{ animeList: AnimeListItem[] }>(
-    cacheKey,
-    () => fetchApi(`/search?q=${encodeURIComponent(trimmed)}&page=${page}`),
-  );
-
-  // Simpan ke history user (fire and forget)
-  if (userId && trimmed) {
-    saveSearchHistory(userId, trimmed).catch(() => {});
-  }
-
-  return result;
-};
-
-/**
- * Ongoing — cache per halaman + order
- */
-export const getOngoing = (
+/** GET /anime/genre/:slug — Daftar anime berdasarkan genre */
+export async function getAnimeByGenre(
+  genreId: string,
   page = 1,
-  order: "popular" | "latest" | "update" = "popular",
-) =>
-  cacheOrFetch<{ animeList: AnimeListItem[] }>(
-    `ongoing:${order}:page:${page}`,
-    () => fetchApi(`/ongoing?page=${page}&order=${order}`),
+): Promise<ApiResponse<{ animeList: CompletedAnime[] }>> {
+  return cacheOrFetch(`anime:genre:${genreId}:page:${page}`, () =>
+    fetchApi<{ animeList: CompletedAnime[] }>(`/genre/${genreId}?page=${page}`),
   );
+}
 
-/**
- * Completed — cache per halaman + order
- */
-export const getCompleted = (
+/** GET /anime/anime/:slug — Detail lengkap sebuah anime */
+export async function getAnimeDetail(
+  slug: string,
+): Promise<ApiResponse<AnimeDetail>> {
+  return cacheOrFetch(`anime:detail:${slug}`, () =>
+    fetchApi<AnimeDetail>(`/anime/${slug}`),
+  );
+}
+
+/** GET /anime/ongoing-anime — Daftar anime ongoing */
+export async function getOngoingAnime(
   page = 1,
-  order: "latest" | "popular" | "update" = "latest",
-) =>
-  cacheOrFetch<{ animeList: AnimeListItem[] }>(
-    `completed:${order}:page:${page}`,
-    () => fetchApi(`/completed?page=${page}&order=${order}`),
+): Promise<ApiResponse<{ animeList: OngoingAnime[] }>> {
+  return cacheOrFetch(`anime:ongoing:page:${page}`, () =>
+    fetchApi<{ animeList: OngoingAnime[] }>(`/ongoing-anime?page=${page}`),
   );
+}
 
-/**
- * Popular — cache per halaman
- */
-export const getPopular = (page = 1) =>
-  cacheOrFetch<{ animeList: AnimeListItem[] }>(`popular:page:${page}`, () =>
-    fetchApi(`/populer?page=${page}`),
-  );
-
-/**
- * Movies — cache per halaman + order
- */
-export const getMovies = (
+/** GET /anime/complete-anime — Daftar anime tamat */
+export async function getCompleteAnime(
   page = 1,
-  order: "update" | "popular" | "latest" = "update",
-) =>
-  cacheOrFetch<{ animeList: AnimeListItem[] }>(
-    `movies:${order}:page:${page}`,
-    () => fetchApi(`/movies?page=${page}&order=${order}`),
+): Promise<ApiResponse<{ animeList: CompletedAnime[] }>> {
+  return cacheOrFetch(`anime:complete:page:${page}`, () =>
+    fetchApi<{ animeList: CompletedAnime[] }>(`/complete-anime?page=${page}`),
   );
+}
 
-/**
- * Anime List A-Z — jarang berubah, cache lebih lama tidak masalah
- */
-export const getAnimeList = () =>
-  cacheOrFetch<{ list: AnimeListGroup[] }>("anime_list", () =>
-    fetchApi("/list"),
+/** GET /anime/episode/:slug — Detail episode + link streaming & download */
+export async function getEpisode(
+  slug: string,
+): Promise<ApiResponse<EpisodeDetail>> {
+  return cacheOrFetch(`anime:episode:${slug}`, () =>
+    fetchApi<EpisodeDetail>(`/episode/${slug}`),
   );
+}
 
-/**
- * Schedule — refresh tiap 10 menit
- */
-export const getSchedule = () =>
-  cacheOrFetch<{ days: ScheduleDay[] }>("schedule", () =>
-    fetchApi("/schedule"),
+/** GET /anime/batch/:slug — Link download batch anime */
+export async function getBatch(slug: string): Promise<ApiResponse<BatchData>> {
+  return cacheOrFetch(`anime:batch:${slug}`, () =>
+    fetchApi<BatchData>(`/batch/${slug}`),
   );
+}
 
-/**
- * Genres — jarang berubah
- */
-export const getGenres = () =>
-  cacheOrFetch<{ genreList: Genre[] }>("genres", () => fetchApi("/genres"));
+/** GET /anime/search/:keyword — Pencarian anime */
+export async function searchAnime(
+  keyword: string,
+  userId?: string,
+): Promise<ApiResponse<{ animeList: SearchAnime[] }>> {
+  const encoded = encodeURIComponent(keyword);
+  const keywordtrim = keyword.trim().toLowerCase();
 
-/**
- * Anime by Genre — cache per genreId + halaman
- */
-export const getByGenre = (genreId: string, page = 1) =>
-  cacheOrFetch<{ animeList: AnimeListItem[] }>(
-    `genre:${genreId}:page:${page}`,
-    () => fetchApi(`/genres/${genreId}?page=${page}`),
+  return cacheOrFetch(`anime:search:${keywordtrim}`, () => {
+    fetchApi<{ animeList: SearchAnime[] }>(`/search/${encoded}`);
+
+    if (userId && keywordtrim) {
+      saveSearchHistory(userId, keywordtrim).catch(() => {});
+    }
+  });
+}
+
+/** GET /anime/server/:serverId — URL embed streaming berdasarkan server ID */
+export async function getServerUrl(
+  serverId: string,
+): Promise<ApiResponse<ServerData>> {
+  return fetchApi<ServerData>(`/server/${serverId}`);
+}
+
+/** GET /anime/unlimited — Semua data anime */
+export async function getAllAnime(): Promise<
+  ApiResponse<{ animeList: UnlimitedAnime[] }>
+> {
+  return cacheOrFetch("anime:unlimited", () =>
+    fetchApi<{ animeList: UnlimitedAnime[] }>("/unlimited"),
   );
-
-/**
- * Batch List — cache per halaman
- */
-export const getBatchList = (page = 1) =>
-  cacheOrFetch<{ batchList: BatchListItem[] }>(`batch_list:page:${page}`, () =>
-    fetchApi(`/batch?page=${page}`),
-  );
-
-/**
- * Detail Anime — cache per animeId
- */
-export const getAnimeDetail = (animeId: string) =>
-  cacheOrFetch<AnimeDetail>(`anime:${animeId}`, () =>
-    fetchApi(`/anime/${animeId}`),
-  );
-
-/**
- * Detail Episode — cache per episodeId
- */
-export const getEpisodeDetail = (episodeId: string) =>
-  cacheOrFetch<EpisodeDetail>(`episode:${episodeId}`, () =>
-    fetchApi(`/episode/${episodeId}`),
-  );
-
-/**
- * Detail Batch — cache per batchId
- */
-export const getBatchDetail = (batchId: string) =>
-  cacheOrFetch<BatchDetail>(`batch:${batchId}`, () =>
-    fetchApi(`/batch/${batchId}`),
-  );
-
-/**
- * Server URL — TIDAK di-cache karena URL streaming biasanya temporary
- */
-export const getServerUrl = (serverId: string) =>
-  fetchApi<ServerData>(`/server/${serverId}`);
+}

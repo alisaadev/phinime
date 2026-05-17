@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-import { Ionicons, MaterialCommunityIcons, Feather } from "@expo/vector-icons";
+import { House, History, Bookmark, User } from "lucide-react";
 import {
   View,
   TouchableOpacity,
@@ -12,10 +12,10 @@ import Text from "@/components/Text";
 import colors from "@/constants/colors";
 
 const ITEMS = [
-  { label: "Beranda", icon: "home", lib: "ion" },
-  { label: "History", icon: "history", lib: "mc" },
-  { label: "Bookmark", icon: "bookmark", lib: "mc" },
-  { label: "Profile", icon: "person", lib: "ion" },
+  { label: "Home", icon: "house" },
+  { label: "History", icon: "history" },
+  { label: "Bookmark", icon: "bookmark" },
+  { label: "Profile", icon: "user" },
 ];
 
 export default function Navbar({ selectedIndex, onSelect }: any) {
@@ -66,18 +66,14 @@ export default function Navbar({ selectedIndex, onSelect }: any) {
 
     const icon = (() => {
       switch (item.lib) {
-        case "ion":
-          return <Ionicons name={item.icon} size={size} color={color} />;
-        case "mc":
-          return (
-            <MaterialCommunityIcons
-              name={item.icon}
-              size={size}
-              color={color}
-            />
-          );
+        case "house":
+          return <House size={size} color={color} />;
+        case "history":
+          return <History size={size} color={color} />;
+        case "bookmark":
+          return <Bookmark size={size} color={color} />;
         default:
-          return <Feather name={item.icon} size={size} color={color} />;
+          return <User size={size} color={color} />;
       }
     })();
 

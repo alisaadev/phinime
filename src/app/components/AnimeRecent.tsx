@@ -1,0 +1,179 @@
+import { Image } from "expo-image";
+import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useEffect, useState, memo } from "react";
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
+
+import Text from "@/components/Text";
+import colors from "@/constants/colors";
+import Loader from "@/components/Loader";
+import { getHome, OngoingAnime } from "@/services/api";
+
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const CARD_WIDTH = (SCREEN_WIDTH - 48) / 2.3;
+const CARD_HEIGHT = CARD_WIDTH * 1.5;
+
+export default function AnimeRecent() {
+  const router = useRouter();
+  const [animeList, setAnimeList] = useState<OngoingAnime[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { ongoing } = await getHome();
+        setAnimeList(ongoing.animeList);
+      } catch (err) {
+        console.error("[OngoingAnime] Gagal fetch:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const renderItem = memo(({ item }: { item: OngoingAnime }) => (
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={0.8}
+      onPress={() => router.push(`/detail/${item.animeId}`)}
+    >
+      <Image
+        source={{ uri: item.poster }}
+        style={{ width: "100%", height: "70%" }}
+        contentFit="cover"
+      />
+
+      <View style={styles.info}>
+        <Text style={styles.title} numberOfLines={2}>
+          {item.title}
+        </Text>
+        <View style={styles.meta}>
+          <View style={styles.epBadge}>
+            <Text style={styles.epText}>Ep {item.episodes}</Text>
+          </View>
+          <Text style={styles.latestReleaseDate} numberOfLines={1}>
+            {item.releaseDay}, {item.latestReleaseDate}
+          </Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  ));
+
+  return (
+    <View style={styles.wrapper}>
+      <View style={styles.header}>
+        <Text style={styles.sectionTitle}>Anime Update</Text>
+        <TouchableOpacity
+          style={styles.scheduleBtn}
+          onPress={() => router.push("/schedule")}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.scheduleBtnText}>Lihat Jadwal</Text>
+          <Ionicons name="chevron-forward" size={14} color={colors.accent} />
+        </TouchableOpacity>
+      </View>
+
+      {loading ? (
+        <View style={styles.skeletonRow}>
+          <Loader visible={loading} />
+        </View>
+      ) : (
+        <FlatList
+          data={animeList}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.animeId}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
+          snapToInterval={CARD_WIDTH + 12}
+          decelerationRate="fast"
+        />
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  wrapper: {
+    marginTop: 8,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    color: colors.text,
+    fontSize: 20,
+    fontWeight: "800",
+  },
+  scheduleBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+  },
+  scheduleBtnText: {
+    color: colors.accent,
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  listContent: {
+    paddingHorizontal: 10,
+    gap: 12,
+  },
+  card: {
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: colors.secondary,
+  },
+  info: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 6,
+    gap: 6,
+  },
+  title: {
+    color: colors.text,
+    fontSize: 12,
+    fontWeight: "700",
+    lineHeight: 16,
+  },
+  meta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  epBadge: {
+    backgroundColor: colors.accent,
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  epText: {
+    color: "white",
+    fontSize: 10,
+    fontWeight: "700",
+  },
+  latestReleaseDate: {
+    color: colors.textDark,
+    fontSize: 10,
+    fontWeight: "500",
+    flex: 1,
+  },
+  skeletonRow: {
+    height: CARD_HEIGHT,
+  },
+});

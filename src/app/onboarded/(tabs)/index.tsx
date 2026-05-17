@@ -8,7 +8,7 @@ import colors from "@/constants/colors";
 import Navbar from "@/components/Navbar";
 import Home from "@/onboarded/(tabs)/home";
 
-export default function Page() {
+export default function index() {
   const [activeTab, setActiveTab] = useState(0);
 
   return (

@@ -15,7 +15,7 @@ type UserData = {
   email: string;
 };
 
-export default function UserProfile() {
+export default function UserProfileHome() {
   const router = useRouter();
   const [user, setUser] = useState<UserData | null>(null);
 
@@ -66,11 +66,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingVertical: 14,
     backgroundColor: colors.secondary,
     borderRadius: 20,
-    marginHorizontal: 16,
+    marginHorizontal: 10,
   },
   left: {
     flexDirection: "row",

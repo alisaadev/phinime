@@ -9,7 +9,7 @@ import Loader from "@/components/Loader";
 import Button from "@/components/Button";
 import { signInWithGoogle } from "@/services/auth";
 
-export default function LoginScreen() {
+export default function Login() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 

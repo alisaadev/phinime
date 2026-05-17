@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
   },
   pill: {
     height: 40,
@@ -181,7 +181,8 @@ const styles = StyleSheet.create({
   pillContent: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 14,
+    paddingHorizontal: 17,
+    justifyContent: "center",
     gap: 8,
   },
   logo: {

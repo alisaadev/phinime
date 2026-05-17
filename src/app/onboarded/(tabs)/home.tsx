@@ -2,8 +2,11 @@ import { useRef } from "react";
 import { View, StyleSheet, Animated } from "react-native";
 
 import colors from "@/constants/colors";
+import GenreList from "@/components/GenreList";
+import AnimeTop from "@/components/AnimeTop";
 import HomeHeader from "@/components/HomeHeader";
-import TopAnimeCard from "@/components/TopAnimeCard";
+import AnimeRecent from "@/components/AnimeRecent";
+import AnimeCompleted from "@/components/AnimeCompleted";
 import UserProfileHome from "@/components/UserProfileHome";
 
 export default function Home() {
@@ -18,11 +21,25 @@ export default function Home() {
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false },
         )}
+        showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
       >
-        <TopAnimeCard />
+        <AnimeTop />
         <View style={styles.barrier} />
+
         <UserProfileHome />
+        <View style={styles.barrier} />
+
+        <GenreList />
+        <View style={styles.barrier} />
+
+        <AnimeRecent />
+        <View style={styles.barrier} />
+
+        <AnimeCompleted />
+        <View style={styles.barrier} />
+
+        <View style={styles.padding} />
       </Animated.ScrollView>
     </View>
   );
@@ -32,10 +49,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    alignItems: "center",
   },
   barrier: {
     width: "100%",
     marginBottom: 14,
+  },
+  padding: {
+    marginBottom: "24%",
   },
 });

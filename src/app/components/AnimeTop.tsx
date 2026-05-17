@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
-import { useRef, useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
+import { useRef, useEffect, useState, memo } from "react";
 import {
   View,
   StyleSheet,
@@ -16,12 +16,12 @@ import {
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import Button from "@/components/Button";
-import { getHome, Top10Item } from "@/services/api";
+import { getHome, Top10Item } from "@/services/api2";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_WIDTH = SCREEN_WIDTH - 48;
 const CARD_HEIGHT = 180;
-const CARD_GAP = 16;
+const CARD_GAP = 10;
 
 function Dot({ active }: { active: boolean }) {
   const width = useRef(new Animated.Value(active ? 20 : 6)).current;
@@ -56,7 +56,7 @@ function Dot({ active }: { active: boolean }) {
   );
 }
 
-export default function TopAnimeCard() {
+export default function AnimeTop() {
   const flatListRef = useRef<FlatList>(null);
   const [animeList, setAnimeList] = useState<Top10Item[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -69,7 +69,7 @@ export default function TopAnimeCard() {
         const { top10 } = await getHome();
         setAnimeList(top10.animeList);
       } catch (err) {
-        console.error("[TopAnimeCard] Gagal fetch:", err);
+        console.error("[AnimeTop] Gagal fetch:", err);
       }
     };
     fetchData();
@@ -121,55 +121,57 @@ export default function TopAnimeCard() {
     );
   }
 
-  const renderItem = ({ item, index }: { item: Top10Item; index: number }) => (
-    <View style={styles.card}>
-      <Image
-        source={{ uri: item.poster }}
-        style={styles.poster}
-        contentFit="cover"
-      />
+  const renderItem = memo(
+    ({ item, index }: { item: Top10Item; index: number }) => (
+      <View style={styles.card}>
+        <Image
+          source={{ uri: item.poster }}
+          style={styles.poster}
+          contentFit="cover"
+        />
 
-      <LinearGradient
-        colors={["rgba(26,26,41,0)", colors.secondary]}
-        start={{ x: 1, y: 0 }}
-        end={{ x: 0.35, y: 0 }}
-        style={StyleSheet.absoluteFillObject}
-      />
-      <LinearGradient
-        colors={["transparent", "rgba(26,26,41,0.5)"]}
-        style={StyleSheet.absoluteFillObject}
-      />
+        <LinearGradient
+          colors={["rgba(26,26,41,0)", colors.secondary]}
+          start={{ x: 1, y: 0 }}
+          end={{ x: 0.35, y: 0 }}
+          style={StyleSheet.absoluteFillObject}
+        />
+        <LinearGradient
+          colors={["transparent", "rgba(26,26,41,0.5)"]}
+          style={StyleSheet.absoluteFillObject}
+        />
 
-      <View style={styles.content}>
-        <View style={styles.topRow}>
-          <View style={styles.rankContainer}>
-            <Text style={styles.rankHash}>#</Text>
-            <Text style={styles.rankNumber}>{index + 1}</Text>
-            <Text style={styles.spotlight}>SPOTLIGHT</Text>
-          </View>
-        </View>
-
-        <Text style={styles.title} numberOfLines={2}>
-          {item.title}
-        </Text>
-
-        <View style={styles.bottomRow}>
-          <Button
-            button={styles.watchButton}
-            onPress={() => console.log("Watch:", item.animeId)}
-          >
-            <View style={styles.playIconWrapper}>
-              <Ionicons name="play" size={9} color={colors.background} />
+        <View style={styles.content}>
+          <View style={styles.topRow}>
+            <View style={styles.rankContainer}>
+              <Text style={styles.rankHash}>#</Text>
+              <Text style={styles.rankNumber}>{index + 1}</Text>
+              <Text style={styles.spotlight}>SPOTLIGHT</Text>
             </View>
-            <Text style={styles.watchText}>Tonton</Text>
-          </Button>
-          <View style={styles.scoreBadge}>
-            <Text style={styles.scoreStar}>⭐</Text>
-            <Text style={styles.scoreText}>{item.score}</Text>
+          </View>
+
+          <Text style={styles.title} numberOfLines={2}>
+            {item.title}
+          </Text>
+
+          <View style={styles.bottomRow}>
+            <Button
+              button={styles.watchButton}
+              onPress={() => console.log("Watch:", item.animeId)}
+            >
+              <View style={styles.playIconWrapper}>
+                <Ionicons name="play" size={9} color={colors.background} />
+              </View>
+              <Text style={styles.watchText}>Tonton</Text>
+            </Button>
+            <View style={styles.scoreBadge}>
+              <Text style={styles.scoreStar}>⭐</Text>
+              <Text style={styles.scoreText}>{item.score}</Text>
+            </View>
           </View>
         </View>
       </View>
-    </View>
+    ),
   );
 
   return (

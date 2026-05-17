@@ -53,7 +53,7 @@ export default function WelcomeScreen() {
           autoPlay
           loop
           style={{ width: 160, height: 160 }}
-          source={require("@/animations/loading_2.json")}
+          source={require("@/animations/loading.json")}
         />
       </View>
     </View>
