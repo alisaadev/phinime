@@ -1,7 +1,8 @@
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRef, useEffect, useState, memo } from "react";
+import { useRef, useEffect, useState, memo, useCallback } from "react";
 import {
   View,
   StyleSheet,
@@ -23,7 +24,13 @@ const CARD_WIDTH = SCREEN_WIDTH - 48;
 const CARD_HEIGHT = 180;
 const CARD_GAP = 10;
 
-function Dot({ active }: { active: boolean }) {
+interface AnimeCardProps {
+  item: Top10Item;
+  index: number;
+  onPress: () => void;
+}
+
+const Dot = memo(({ active }: { active: boolean }) => {
   const width = useRef(new Animated.Value(active ? 20 : 6)).current;
   const opacity = useRef(new Animated.Value(active ? 1 : 0.4)).current;
 
@@ -54,9 +61,80 @@ function Dot({ active }: { active: boolean }) {
       }}
     />
   );
+});
+
+const AnimeCard = memo(({ item, index, onPress }: AnimeCardProps) => (
+  <View style={styles.card}>
+    <Image
+      source={{ uri: item.poster }}
+      style={styles.poster}
+      contentFit="cover"
+    />
+
+    <LinearGradient
+      colors={["rgba(26,26,41,0)", colors.secondary]}
+      start={{ x: 1, y: 0 }}
+      end={{ x: 0.35, y: 0 }}
+      style={StyleSheet.absoluteFillObject}
+    />
+    <LinearGradient
+      colors={["transparent", "rgba(26,26,41,0.5)"]}
+      style={StyleSheet.absoluteFillObject}
+    />
+
+    <View style={styles.content}>
+      <View style={styles.topRow}>
+        <View style={styles.rankContainer}>
+          <Text style={styles.rankHash}>#</Text>
+          <Text style={styles.rankNumber}>{index + 1}</Text>
+          <Text style={styles.spotlight}>SPOTLIGHT</Text>
+        </View>
+      </View>
+
+      <Text style={styles.title} numberOfLines={2}>
+        {item.title}
+      </Text>
+
+      <View style={styles.bottomRow}>
+        <Button button={styles.watchButton} onPress={onPress}>
+          <View style={styles.playIconWrapper}>
+            <Ionicons name="play" size={9} color={colors.background} />
+          </View>
+          <Text style={styles.watchText}>Tonton</Text>
+        </Button>
+        <View style={styles.scoreBadge}>
+          <Text style={styles.scoreStar}>⭐</Text>
+          <Text style={styles.scoreText}>{item.score}</Text>
+        </View>
+      </View>
+    </View>
+  </View>
+));
+
+function SkeletonCard() {
+  return (
+    <View style={styles.skeletonWrapper}>
+      <View style={styles.skeletonCard}>
+        <View style={styles.skeletonPoster} />
+        <View style={styles.skeletonContent}>
+          <View style={styles.skeletonRank} />
+          <View style={styles.skeletonTitle} />
+          <View style={styles.skeletonTitleShort} />
+          <View style={styles.skeletonButton} />
+        </View>
+      </View>
+
+      <View style={styles.skeletonDots}>
+        {[...Array(5)].map((_, i) => (
+          <View key={i} style={styles.skeletonDot} />
+        ))}
+      </View>
+    </View>
+  );
 }
 
 export default function AnimeTop() {
+  const router = useRouter();
   const flatListRef = useRef<FlatList>(null);
   const [animeList, setAnimeList] = useState<Top10Item[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -64,16 +142,17 @@ export default function AnimeTop() {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { top10 } = await getHome();
-        setAnimeList(top10.animeList);
-      } catch (err) {
-        console.error("[AnimeTop] Gagal fetch:", err);
-      }
-    };
     fetchData();
   }, []);
+
+  async function fetchData() {
+    try {
+      const { top10 } = await getHome();
+      setAnimeList(top10.animeList);
+    } catch (err) {
+      console.error("[AnimeTop] Gagal fetch:", err);
+    }
+  }
 
   useEffect(() => {
     if (!isAutoPlay || animeList.length === 0) return;
@@ -91,88 +170,47 @@ export default function AnimeTop() {
     };
   }, [isAutoPlay, animeList]);
 
-  const onScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const index = Math.round(
-      e.nativeEvent.contentOffset.x / (CARD_WIDTH + CARD_GAP),
-    );
-    setActiveIndex(index);
-  };
-
-  if (animeList.length === 0) {
-    return (
-      <View style={styles.skeletonWrapper}>
-        <View style={styles.skeletonCard}>
-          <View style={styles.skeletonPoster} />
-
-          <View style={styles.skeletonContent}>
-            <View style={styles.skeletonRank} />
-            <View style={styles.skeletonTitle} />
-            <View style={styles.skeletonTitleShort} />
-            <View style={styles.skeletonButton} />
-          </View>
-        </View>
-
-        <View style={styles.skeletonDots}>
-          {[...Array(5)].map((_, i) => (
-            <View key={i} style={styles.skeletonDot} />
-          ))}
-        </View>
-      </View>
-    );
-  }
-
-  const renderItem = memo(
-    ({ item, index }: { item: Top10Item; index: number }) => (
-      <View style={styles.card}>
-        <Image
-          source={{ uri: item.poster }}
-          style={styles.poster}
-          contentFit="cover"
-        />
-
-        <LinearGradient
-          colors={["rgba(26,26,41,0)", colors.secondary]}
-          start={{ x: 1, y: 0 }}
-          end={{ x: 0.35, y: 0 }}
-          style={StyleSheet.absoluteFillObject}
-        />
-        <LinearGradient
-          colors={["transparent", "rgba(26,26,41,0.5)"]}
-          style={StyleSheet.absoluteFillObject}
-        />
-
-        <View style={styles.content}>
-          <View style={styles.topRow}>
-            <View style={styles.rankContainer}>
-              <Text style={styles.rankHash}>#</Text>
-              <Text style={styles.rankNumber}>{index + 1}</Text>
-              <Text style={styles.spotlight}>SPOTLIGHT</Text>
-            </View>
-          </View>
-
-          <Text style={styles.title} numberOfLines={2}>
-            {item.title}
-          </Text>
-
-          <View style={styles.bottomRow}>
-            <Button
-              button={styles.watchButton}
-              onPress={() => console.log("Watch:", item.animeId)}
-            >
-              <View style={styles.playIconWrapper}>
-                <Ionicons name="play" size={9} color={colors.background} />
-              </View>
-              <Text style={styles.watchText}>Tonton</Text>
-            </Button>
-            <View style={styles.scoreBadge}>
-              <Text style={styles.scoreStar}>⭐</Text>
-              <Text style={styles.scoreText}>{item.score}</Text>
-            </View>
-          </View>
-        </View>
-      </View>
-    ),
+  const handlePress = useCallback(
+    (animeId: string) => () => router.push(`/detail/${animeId}`),
+    [router],
   );
+
+  const onScrollEnd = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const index = Math.round(
+        e.nativeEvent.contentOffset.x / (CARD_WIDTH + CARD_GAP),
+      );
+      setActiveIndex(index);
+    },
+    [],
+  );
+
+  const onScrollBeginDrag = useCallback(() => setIsAutoPlay(false), []);
+  const onScrollEndDrag = useCallback(() => setIsAutoPlay(true), []);
+
+  const renderItem = useCallback(
+    ({ item, index }: { item: Top10Item; index: number }) => (
+      <AnimeCard
+        item={item}
+        index={index}
+        onPress={handlePress(item.animeId)}
+      />
+    ),
+    [handlePress],
+  );
+
+  const keyExtractor = useCallback((item: Top10Item) => String(item.rank), []);
+
+  const getItemLayout = useCallback(
+    (_: any, index: number) => ({
+      length: CARD_WIDTH + CARD_GAP,
+      offset: (CARD_WIDTH + CARD_GAP) * index,
+      index,
+    }),
+    [],
+  );
+
+  if (animeList.length === 0) return <SkeletonCard />;
 
   return (
     <View style={styles.wrapper}>
@@ -180,7 +218,7 @@ export default function AnimeTop() {
         ref={flatListRef}
         data={animeList}
         renderItem={renderItem}
-        keyExtractor={(item) => String(item.rank)}
+        keyExtractor={keyExtractor}
         horizontal
         pagingEnabled={false}
         showsHorizontalScrollIndicator={false}
@@ -190,13 +228,13 @@ export default function AnimeTop() {
         contentContainerStyle={styles.listContent}
         onMomentumScrollEnd={onScrollEnd}
         scrollEventThrottle={16}
-        onScrollBeginDrag={() => setIsAutoPlay(false)}
-        onScrollEndDrag={() => setIsAutoPlay(true)}
-        getItemLayout={(_, index) => ({
-          length: CARD_WIDTH + CARD_GAP,
-          offset: (CARD_WIDTH + CARD_GAP) * index,
-          index,
-        })}
+        onScrollBeginDrag={onScrollBeginDrag}
+        onScrollEndDrag={onScrollEndDrag}
+        getItemLayout={getItemLayout}
+        removeClippedSubviews
+        initialNumToRender={3}
+        maxToRenderPerBatch={3}
+        windowSize={5}
       />
 
       <View style={styles.dots}>

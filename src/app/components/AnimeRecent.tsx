@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState, memo } from "react";
+import { useEffect, useState, memo, useCallback } from "react";
 import {
   View,
   StyleSheet,
@@ -19,52 +19,68 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_WIDTH = (SCREEN_WIDTH - 48) / 2.3;
 const CARD_HEIGHT = CARD_WIDTH * 1.5;
 
+interface AnimeCardProps {
+  item: OngoingAnime;
+  onPress: () => void;
+}
+
+const AnimeCard = memo(({ item, onPress }: AnimeCardProps) => (
+  <TouchableOpacity style={styles.card} activeOpacity={0.8} onPress={onPress}>
+    <Image
+      source={{ uri: item.poster }}
+      style={{ width: "100%", height: "70%" }}
+      contentFit="cover"
+    />
+
+    <View style={styles.info}>
+      <Text style={styles.title} numberOfLines={2}>
+        {item.title}
+      </Text>
+      <View style={styles.meta}>
+        <View style={styles.epBadge}>
+          <Text style={styles.epText}>Ep {item.episodes}</Text>
+        </View>
+        <Text style={styles.latestReleaseDate} numberOfLines={1}>
+          {item.releaseDay}, {item.latestReleaseDate}
+        </Text>
+      </View>
+    </View>
+  </TouchableOpacity>
+));
+
 export default function AnimeRecent() {
   const router = useRouter();
   const [animeList, setAnimeList] = useState<OngoingAnime[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { ongoing } = await getHome();
-        setAnimeList(ongoing.animeList);
-      } catch (err) {
-        console.error("[OngoingAnime] Gagal fetch:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, []);
 
-  const renderItem = memo(({ item }: { item: OngoingAnime }) => (
-    <TouchableOpacity
-      style={styles.card}
-      activeOpacity={0.8}
-      onPress={() => router.push(`/detail/${item.animeId}`)}
-    >
-      <Image
-        source={{ uri: item.poster }}
-        style={{ width: "100%", height: "70%" }}
-        contentFit="cover"
-      />
+  async function fetchData() {
+    try {
+      const home = await getHome();
+      setAnimeList(home.ongoing.animeList);
+    } catch (err) {
+      console.error("[AnimeRecent] Gagal fetch:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
-      <View style={styles.info}>
-        <Text style={styles.title} numberOfLines={2}>
-          {item.title}
-        </Text>
-        <View style={styles.meta}>
-          <View style={styles.epBadge}>
-            <Text style={styles.epText}>Ep {item.episodes}</Text>
-          </View>
-          <Text style={styles.latestReleaseDate} numberOfLines={1}>
-            {item.releaseDay}, {item.latestReleaseDate}
-          </Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-  ));
+  const handlePress = useCallback(
+    (animeId: string) => () => router.push(`/detail/${animeId}`),
+    [router],
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: OngoingAnime }) => (
+      <AnimeCard item={item} onPress={handlePress(item.animeId)} />
+    ),
+    [handlePress],
+  );
+
+  const keyExtractor = useCallback((item: OngoingAnime) => item.animeId, []);
 
   return (
     <View style={styles.wrapper}>
@@ -88,12 +104,16 @@ export default function AnimeRecent() {
         <FlatList
           data={animeList}
           renderItem={renderItem}
-          keyExtractor={(item) => item.animeId}
+          keyExtractor={keyExtractor}
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.listContent}
           snapToInterval={CARD_WIDTH + 12}
           decelerationRate="fast"
+          removeClippedSubviews
+          initialNumToRender={4}
+          maxToRenderPerBatch={4}
+          windowSize={5}
         />
       )}
     </View>

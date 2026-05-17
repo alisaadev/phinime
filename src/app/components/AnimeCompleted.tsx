@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState, memo } from "react";
+import { useEffect, useState, memo, useCallback } from "react";
 import { TouchableOpacity, StyleSheet, View, Dimensions } from "react-native";
 
 import Text from "@/components/Text";
@@ -14,9 +14,80 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_HEIGHT = (SCREEN_WIDTH - 48) / 2.3;
 
 interface CardData {
-  id: CompletedAnime;
+  id: string;
   item: AnimeDetail | null;
 }
+
+interface AnimeCardProps {
+  item: AnimeDetail | null;
+  onPress?: () => void;
+}
+
+const AnimeCard = memo(({ item, onPress }: AnimeCardProps) => {
+  const genres = item?.genreList ?? [];
+  const visible = genres.slice(0, 3);
+  const extra = genres.length - 3;
+
+  const synopsis = item?.synopsis?.paragraphs?.[0] ?? "";
+  const studios = item?.studios ?? "Unknown";
+  const score = item?.score ?? "Unknown";
+
+  return (
+    <TouchableOpacity style={styles.card} activeOpacity={0.8} onPress={onPress}>
+      <Image
+        source={{ uri: item?.poster }}
+        style={{ width: "30%", height: "100%" }}
+        contentFit="cover"
+      />
+
+      <View style={styles.content}>
+        <View style={styles.metaRow}>
+          <View style={styles.metaBadge}>
+            <Text style={styles.metaBadgeText}>{item?.episodes} Eps</Text>
+          </View>
+          <View style={styles.metaBadge}>
+            <Text style={styles.metaBadgeText}>
+              {item?.status ?? "Unknown"}
+            </Text>
+          </View>
+          <View style={{ flex: 1 }} />
+          <View style={styles.metaBadge}>
+            <Text style={styles.metaBadgeText}>{item?.aired ?? "Unknown"}</Text>
+          </View>
+        </View>
+
+        <Text style={styles.title} numberOfLines={1}>
+          {item?.title}
+        </Text>
+
+        <View style={styles.genreRow}>
+          {visible.map((g, i) => (
+            <View key={i} style={styles.genreBadge}>
+              <Text style={styles.genreBadgeText}>{g.title}</Text>
+            </View>
+          ))}
+          {extra > 0 && (
+            <View style={styles.genreBadge}>
+              <Text style={styles.genreBadgeText}>+{extra}</Text>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.studioRow}>
+          {!!studios && <Text style={styles.studio}>{studios}</Text>}
+          {!!studios && !!score && <Text style={styles.dot}>{"•"}</Text>}
+          {!!score && <Text style={styles.score}>{score}</Text>}
+        </View>
+
+        {!!synopsis && (
+          <Text style={styles.synopsis} numberOfLines={3}>
+            {synopsis}
+          </Text>
+        )}
+      </View>
+    </TouchableOpacity>
+  );
+});
 
 export default function AnimeCompleted() {
   const router = useRouter();
@@ -24,107 +95,45 @@ export default function AnimeCompleted() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const home = await getHome();
-        const list = home.completed.animeList;
-
-        setAnimeList(list.map((id) => ({ id, item: null })));
-        list.forEach(async (anime, idx) => {
-          try {
-            const res = await getAnimeDetail(anime.animeId);
-
-            setAnimeList((prev) => {
-              const next = [...prev];
-              next[idx] = { id: anime.animeId, item: res };
-
-              return next;
-            });
-          } catch {
-            console.error("[OngoingAnime] Gagal fetch:", err);
-          }
-        });
-      } catch (err) {
-        console.error("[OngoingAnime] Gagal fetch:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
 
-  const AnimeCard = memo(
-    ({ item, onPress }: { item: CardData; onPress?: () => void }) => {
-      const genres = item?.genreList ?? [];
-      const visible = genres.slice(0, 3);
-      const extra = genres.length - 3;
+  async function fetchData() {
+    try {
+      setLoading(true);
 
-      const synopsis = item?.synopsis?.paragraphs?.[0] ?? "";
-      const studios = item?.studios ?? "Unknown";
-      const score = item?.score ?? "Unknown";
+      const home = await getHome();
+      const list: CompletedAnime[] = home.completed.animeList;
 
-      return (
-        <TouchableOpacity
-          style={styles.card}
-          activeOpacity={0.8}
-          onPress={onPress}
-        >
-          <Image
-            source={{ uri: item?.poster }}
-            style={{ width: "30%", height: "100%" }}
-            contentFit="cover"
-          />
+      setAnimeList(list.map((anime) => ({ id: anime.animeId, item: null })));
 
-          <View style={styles.content}>
-            <View style={styles.metaRow}>
-              <View style={styles.metaBadge}>
-                <Text style={styles.metaBadgeText}>{item?.episodes} Eps</Text>
-              </View>
-              <View style={styles.metaBadge}>
-                <Text style={styles.metaBadgeText}>
-                  {item?.status ?? "Unknown"}
-                </Text>
-              </View>
-              <View style={{ flex: 1 }} />
-              <View style={styles.metaBadge}>
-                <Text style={styles.metaBadgeText}>
-                  {item?.aired ?? "Unknown"}
-                </Text>
-              </View>
-            </View>
+      for (let idx = 0; idx < list.length; idx++) {
+        const anime = list[idx];
+        try {
+          const res = await getAnimeDetail(anime.animeId);
+          setAnimeList((prev) => {
+            const next = [...prev];
+            next[idx] = { id: anime.animeId, item: res };
+            return next;
+          });
+        } catch (err) {
+          console.error(
+            "[AnimeCompleted] Gagal fetch detail:",
+            anime.animeId,
+            err,
+          );
+        }
+      }
+    } catch (err) {
+      console.error("[AnimeCompleted] Gagal fetch home:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
-            <Text style={styles.title} numberOfLines={1}>
-              {item?.title}
-            </Text>
-
-            <View style={styles.genreRow}>
-              {visible.map((g, i) => (
-                <View key={i} style={styles.genreBadge}>
-                  <Text style={styles.genreBadgeText}>{g.title}</Text>
-                </View>
-              ))}
-              {extra > 0 && (
-                <View style={styles.genreBadge}>
-                  <Text style={styles.genreBadgeText}>+{extra}</Text>
-                </View>
-              )}
-            </View>
-
-            <View style={styles.studioRow}>
-              {!!studios && <Text style={styles.studio}>{studios}</Text>}
-              {!!studios && !!score && <Text style={styles.dot}>{"•"}</Text>}
-              {!!score && <Text style={styles.score}>{score}</Text>}
-            </View>
-            {!!synopsis ? (
-              <Text style={styles.synopsis} numberOfLines={3}>
-                {synopsis}
-              </Text>
-            ) : null}
-          </View>
-        </TouchableOpacity>
-      );
-    },
+  const handlePress = useCallback(
+    (id: string) => () => router.push(`/detail/${id}`),
+    [router],
   );
 
   return (
@@ -141,17 +150,14 @@ export default function AnimeCompleted() {
         </TouchableOpacity>
       </View>
 
-      {loading ? (
+      {loading && animeList.length === 0 ? (
         <View style={styles.skeletonRow}>
           <Loader visible={loading} />
         </View>
       ) : (
-        animeList.map((item, idx) => (
-          <View key={idx}>
-            <AnimeCard
-              item={item.item}
-              onPress={() => router.push(`/detail/${item.id}`)}
-            />
+        animeList.map((card, idx) => (
+          <View key={card.id}>
+            <AnimeCard item={card.item} onPress={handlePress(card.id)} />
             {idx < animeList.length - 1 && <View style={{ height: 12 }} />}
           </View>
         ))

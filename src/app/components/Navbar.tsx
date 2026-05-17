@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState } from "react";
-import { House, History, Bookmark, User } from "lucide-react";
 import {
   View,
   TouchableOpacity,
@@ -8,14 +7,15 @@ import {
   LayoutChangeEvent,
 } from "react-native";
 
+import Icon from "@/components/Icon";
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
 
 const ITEMS = [
-  { label: "Home", icon: "house" },
-  { label: "History", icon: "history" },
-  { label: "Bookmark", icon: "bookmark" },
-  { label: "Profile", icon: "user" },
+  { label: "Beranda", icon: "House" },
+  { label: "History", icon: "History" },
+  { label: "Bookmark", icon: "Bookmark" },
+  { label: "Profile", icon: "User" },
 ];
 
 export default function Navbar({ selectedIndex, onSelect }: any) {
@@ -64,20 +64,7 @@ export default function Navbar({ selectedIndex, onSelect }: any) {
     const color = active ? colors.accent : "rgba(255,255,255,0.5)";
     const size = 26;
 
-    const icon = (() => {
-      switch (item.lib) {
-        case "house":
-          return <House size={size} color={color} />;
-        case "history":
-          return <History size={size} color={color} />;
-        case "bookmark":
-          return <Bookmark size={size} color={color} />;
-        default:
-          return <User size={size} color={color} />;
-      }
-    })();
-
-    return icon;
+    return <Icon name={item.icon} size={size} color={color} />;
   };
 
   return (

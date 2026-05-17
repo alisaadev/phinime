@@ -1,3 +1,4 @@
+import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 import { useState, useRef } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -28,15 +29,15 @@ export default function HomeHeader({ scrollY }: Props) {
   const textOpacity = useRef(new Animated.Value(1)).current;
   const inputOpacity = useRef(new Animated.Value(0)).current;
 
+  const blurOpacity = scrollY.interpolate({
+    inputRange: [0, 20, 100],
+    outputRange: [0, 0, 1],
+    extrapolate: "clamp",
+  });
+
   const animatedWidth = pillWidth.interpolate({
     inputRange: [0, 1],
     outputRange: ["33%", "85%"],
-  });
-
-  const backgroundColor = scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: ["transparent", colors.background],
-    extrapolate: "clamp",
   });
 
   const openSearch = () => {
@@ -94,7 +95,17 @@ export default function HomeHeader({ scrollY }: Props) {
   };
 
   return (
-    <Animated.View style={[styles.header, { backgroundColor }]}>
+    <View style={styles.header}>
+      <Animated.View style={[StyleSheet.absoluteFillObject, { opacity: blurOpacity }]}>
+        <BlurView
+          style={StyleSheet.absoluteFillObject}
+          intensity={60}
+          tint="dark"
+          experimentalBlurMethod="dimezisBlurView"
+        />
+        <View style={styles.blurOverlay} />
+      </Animated.View>
+
       <Animated.View style={[styles.pill, { width: animatedWidth }]}>
         <Animated.View
           style={[
@@ -153,7 +164,7 @@ export default function HomeHeader({ scrollY }: Props) {
           color={colors.text}
         />
       </TouchableOpacity>
-    </Animated.View>
+    </View>
   );
 }
 
@@ -168,6 +179,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 10,
+  },
+  blurOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.25)",
   },
   pill: {
     height: 40,
