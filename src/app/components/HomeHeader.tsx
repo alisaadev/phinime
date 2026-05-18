@@ -115,11 +115,7 @@ export default function HomeHeader({ scrollY }: Props) {
           ]}
           pointerEvents={searchOpen ? "auto" : "none"}
         >
-          <Icon
-            name="Search"
-            size={14}
-            color={colors.textDark}
-          />
+          <Icon name="Search" size={14} color={colors.textDark} />
           <TextInput
             ref={inputRef}
             style={styles.searchInput}
@@ -132,11 +128,7 @@ export default function HomeHeader({ scrollY }: Props) {
           />
           {query.length > 0 && (
             <TouchableOpacity onPress={() => setQuery("")}>
-              <Icon
-                name="X"
-                size={14}
-                color={colors.textDark}
-              />
+              <Icon name="X" size={14} color={colors.textDark} />
             </TouchableOpacity>
           )}
         </Animated.View>

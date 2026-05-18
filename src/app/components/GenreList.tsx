@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: colors.text,
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "800",
   },
   listContent: {
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   },
   chipText: {
     color: colors.text,
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: "600",
   },
   skeletonRow: {

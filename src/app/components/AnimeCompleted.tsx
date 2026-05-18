@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: colors.text,
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "800",
   },
   completedBtn: {
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   },
   completedBtnText: {
     color: colors.accent,
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: "600",
   },
   card: {

@@ -14,41 +14,31 @@ export default function index() {
   const blurTargetRef = useRef<View | null>(null);
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.safeAreaView}>
-        <StatusBar style="light" />
-        <View style={styles.container}>
-          <BlurTargetView ref={blurTargetRef} style={styles.blurTarget}>
-            <View
-              style={[styles.contentArea, activeTab !== 0 && styles.hidden]}
-            >
-              <Home />
-            </View>
-            <View
-              style={[styles.contentArea, activeTab !== 1 && styles.hidden]}
-            >
-              <Text style={styles.contentText}>Halaman Superuser</Text>
-            </View>
-            <View
-              style={[styles.contentArea, activeTab !== 2 && styles.hidden]}
-            >
-              <Text style={styles.contentText}>Halaman Modul</Text>
-            </View>
-            <View
-              style={[styles.contentArea, activeTab !== 3 && styles.hidden]}
-            >
-              <Text style={styles.contentText}>Halaman Setelan</Text>
-            </View>
-          </BlurTargetView>
+    <>
+      <StatusBar style="light" />
+      <View style={styles.container}>
+        <BlurTargetView ref={blurTargetRef} style={styles.blurTarget}>
+          <View style={[styles.contentArea, activeTab !== 0 && styles.hidden]}>
+            <Home />
+          </View>
+          <View style={[styles.contentArea, activeTab !== 1 && styles.hidden]}>
+            <Text style={styles.contentText}>Halaman Superuser</Text>
+          </View>
+          <View style={[styles.contentArea, activeTab !== 2 && styles.hidden]}>
+            <Text style={styles.contentText}>Halaman Modul</Text>
+          </View>
+          <View style={[styles.contentArea, activeTab !== 3 && styles.hidden]}>
+            <Text style={styles.contentText}>Halaman Setelan</Text>
+          </View>
+        </BlurTargetView>
 
-          <Navbar
-            selectedIndex={activeTab}
-            onSelect={(index: number) => setActiveTab(index)}
-            blurTargetRef={blurTargetRef}
-          />
-        </View>
-      </SafeAreaView>
-    </SafeAreaProvider>
+        <Navbar
+          selectedIndex={activeTab}
+          onSelect={(index: number) => setActiveTab(index)}
+          blurTargetRef={blurTargetRef}
+        />
+      </View>
+    </>
   );
 }
 
