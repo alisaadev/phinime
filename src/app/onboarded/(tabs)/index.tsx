@@ -7,7 +7,9 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import Navbar from "@/components/Navbar";
+
 import Home from "@/onboarded/(tabs)/home";
+import History from "@/onboarded/(tabs)/history";
 
 export default function index() {
   const [activeTab, setActiveTab] = useState(0);
@@ -22,7 +24,7 @@ export default function index() {
             <Home />
           </View>
           <View style={[styles.contentArea, activeTab !== 1 && styles.hidden]}>
-            <Text style={styles.contentText}>Halaman Superuser</Text>
+            <History />
           </View>
           <View style={[styles.contentArea, activeTab !== 2 && styles.hidden]}>
             <Text style={styles.contentText}>Halaman Modul</Text>
@@ -43,12 +45,10 @@ export default function index() {
 }
 
 const styles = StyleSheet.create({
-  safeAreaView: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
   container: {
     flex: 1,
+    backgroundColor: colors.background,
+    paddingTop: 28,
   },
   blurTarget: {
     flex: 1,
