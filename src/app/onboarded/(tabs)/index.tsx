@@ -8,8 +8,10 @@ import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import Navbar from "@/components/Navbar";
 
-import Home from "@/onboarded/(tabs)/home";
-import History from "@/onboarded/(tabs)/history";
+import Home from "@/onboarded/(tabs)/HomeScreen";
+import Profile from "@/onboarded/(tabs)/ProfileScreen";
+import History from "@/onboarded/(tabs)/HistoryScreen";
+import Bookmark from "@/onboarded/(tabs)/BookmarkScreen";
 
 export default function index() {
   const [activeTab, setActiveTab] = useState(0);
@@ -27,10 +29,10 @@ export default function index() {
             <History />
           </View>
           <View style={[styles.contentArea, activeTab !== 2 && styles.hidden]}>
-            <Text style={styles.contentText}>Halaman Modul</Text>
+            <Bookmark />
           </View>
           <View style={[styles.contentArea, activeTab !== 3 && styles.hidden]}>
-            <Text style={styles.contentText}>Halaman Setelan</Text>
+            <Profile />
           </View>
         </BlurTargetView>
 

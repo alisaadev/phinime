@@ -1,5 +1,6 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState, useCallback, memo } from "react";
 import {
   View,
@@ -7,7 +8,6 @@ import {
   SectionList,
   TouchableOpacity,
   Dimensions,
-  Alert,
 } from "react-native";
 
 import Icon from "@/components/Icon";
@@ -32,13 +32,11 @@ const CARD_HEIGHT = CARD_WIDTH * 1.5;
 interface CardProps {
   item: WatchHistory;
   onPress: (item: WatchHistory) => void;
-  onLongPress: (item: WatchHistory) => void;
 }
 
 interface RowProps {
   items: WatchHistory[];
   onPress: (item: WatchHistory) => void;
-  onLongPress: (item: WatchHistory) => void;
 }
 
 function isSameDay(a: Date, b: Date): boolean {
@@ -95,7 +93,7 @@ function SkeletonGrid() {
   return (
     <View style={styles.skeletonWrapper}>
       {[...Array(2)].map((_, si) => (
-        <View key={si} style={{ marginBottom: 20 }}>
+        <View key={si} style={{ marginBottom: 12 }}>
           <View style={styles.skeletonLabel} />
           <View style={styles.row}>
             {[...Array(3)].map((_, i) => (
@@ -111,16 +109,17 @@ function SkeletonGrid() {
 function EmptyState() {
   return (
     <View style={styles.emptyWrapper}>
-      <Icon name="History" size={64} color={colors.textDark} />
+      <Icon name="History" size={64} color={colors.accent} />
       <Text style={styles.emptyTitle}>Belum ada history</Text>
       <Text style={styles.emptySubtitle}>
-        Anime yang kamu tonton akan muncul di sini
+        Untaian kisah yang kaudambakan akan terlahir di sini, tepat di hadapan
+        matamu.
       </Text>
     </View>
   );
 }
 
-const HistoryCard = memo(({ item, onPress, onLongPress }: CardProps) => {
+const HistoryCard = memo(({ item, onPress }: CardProps) => {
   const percent = getProgressPercent(item);
   const watched = isWatched(item);
 
@@ -129,7 +128,6 @@ const HistoryCard = memo(({ item, onPress, onLongPress }: CardProps) => {
       style={styles.card}
       activeOpacity={0.8}
       onPress={() => onPress(item)}
-      onLongPress={() => onLongPress(item)}
     >
       <Image
         source={{ uri: item.poster ?? undefined }}
@@ -137,10 +135,14 @@ const HistoryCard = memo(({ item, onPress, onLongPress }: CardProps) => {
         contentFit="cover"
       />
 
-      <View style={styles.overlay} />
+      <LinearGradient
+        colors={["transparent", colors.secondary]}
+        style={styles.overlay}
+      />
+
       {watched && (
         <View style={styles.watchedBadge}>
-          <Icon name="Check" size={10} color="#fff" />
+          <Icon name="Check" size={12} color="#fff" />
         </View>
       )}
 
@@ -160,16 +162,12 @@ const HistoryCard = memo(({ item, onPress, onLongPress }: CardProps) => {
   );
 });
 
-const HistoryRow = memo(({ items, onPress, onLongPress }: RowProps) => (
+const HistoryRow = memo(({ items, onPress }: RowProps) => (
   <View style={styles.row}>
     {items.map((item) => (
-      <HistoryCard
-        key={item.episode_id}
-        item={item}
-        onPress={onPress}
-        onLongPress={onLongPress}
-      />
+      <HistoryCard key={item.episode_id} item={item} onPress={onPress} />
     ))}
+
     {items.length < 3 &&
       [...Array(3 - items.length)].map((_, i) => (
         <View key={`placeholder-${i}`} style={styles.cardPlaceholder} />
@@ -193,6 +191,7 @@ export default function HistoryScreen() {
     const { data } = await supabase.auth.getUser();
     const uid = data.user?.id ?? null;
     setUserId(uid);
+
     if (uid) await fetchHistory(uid);
     setLoading(false);
   }
@@ -210,43 +209,6 @@ export default function HistoryScreen() {
     [router],
   );
 
-  const handleLongPress = useCallback(
-    (item: WatchHistory) => {
-      Alert.alert("Hapus History", `Hapus "${item.ep_title}" dari history?`, [
-        { text: "Batal", style: "cancel" },
-        {
-          text: "Hapus",
-          style: "destructive",
-          onPress: async () => {
-            if (!userId) return;
-            await deleteWatchHistory(userId, item.episode_id);
-            await fetchHistory(userId);
-          },
-        },
-      ]);
-    },
-    [userId],
-  );
-
-  const handleClearAll = useCallback(() => {
-    Alert.alert(
-      "Hapus Semua History",
-      "Yakin ingin menghapus semua history tontonan?",
-      [
-        { text: "Batal", style: "cancel" },
-        {
-          text: "Hapus Semua",
-          style: "destructive",
-          onPress: async () => {
-            if (!userId) return;
-            await clearWatchHistory(userId);
-            setSections([]);
-          },
-        },
-      ],
-    );
-  }, [userId]);
-
   const renderSectionHeader = useCallback(
     ({ section }: { section: { title: string } }) => (
       <View style={styles.sectionHeader}>
@@ -258,13 +220,9 @@ export default function HistoryScreen() {
 
   const renderItem = useCallback(
     ({ item }: { item: WatchHistory[] }) => (
-      <HistoryRow
-        items={item}
-        onPress={handlePress}
-        onLongPress={handleLongPress}
-      />
+      <HistoryRow items={item} onPress={handlePress} />
     ),
-    [handlePress, handleLongPress],
+    [handlePress],
   );
 
   const keyExtractor = useCallback(
@@ -275,12 +233,11 @@ export default function HistoryScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>History</Text>
-        {sections.length > 0 && (
-          <TouchableOpacity onPress={handleClearAll} activeOpacity={0.7}>
-            <Text style={styles.clearBtn}>Hapus semua</Text>
-          </TouchableOpacity>
-        )}
+        <View style={styles.pill}>
+          <View style={styles.pillContent}>
+            <Text style={styles.headerTitle}>History</Text>
+          </View>
+        </View>
       </View>
 
       {loading ? (
@@ -312,41 +269,48 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
+    zIndex: 10,
+    height: 56,
+    width: "100%",
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: PADDING,
-    paddingTop: 16,
-    paddingBottom: 8,
+  },
+  pill: {
+    height: 40,
+    backgroundColor: colors.secondary,
+    borderRadius: 20,
+    borderWidth: 0.8,
+    borderColor: "rgba(255,255,255,0.2)",
+    justifyContent: "center",
+  },
+  pillContent: {
+    paddingHorizontal: 17,
+    gap: 8,
   },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: "800",
     color: colors.text,
-  },
-  clearBtn: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: colors.accent,
+    fontSize: 18,
+    fontWeight: "800",
+    letterSpacing: 0.5,
   },
   listContent: {
     paddingHorizontal: PADDING,
-    paddingBottom: 100,
+    marginBottom: 100,
   },
   sectionHeader: {
-    paddingTop: 12,
-    paddingBottom: 8,
+    marginBottom: 8,
   },
   sectionTitle: {
     fontSize: 14,
     fontWeight: "700",
-    color: colors.textDark,
+    color: colors.textSecondary,
     letterSpacing: 0.3,
   },
   row: {
     flexDirection: "row",
     gap: GAP,
-    marginBottom: GAP,
+    marginBottom: 12,
   },
   card: {
     width: CARD_WIDTH,
@@ -365,9 +329,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: "60%",
-    backgroundColor: "rgba(0,0,0,0)",
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
   },
   watchedBadge: {
     position: "absolute",
@@ -376,7 +337,7 @@ const styles = StyleSheet.create({
     width: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: colors.accent,
+    backgroundColor: "#6FAF4F",
     justifyContent: "center",
     alignItems: "center",
     zIndex: 2,
@@ -395,7 +356,7 @@ const styles = StyleSheet.create({
   },
   cardEp: {
     fontSize: 8,
-    color: "rgba(255,255,255,0.6)",
+    color: colors.textDark,
     marginTop: 2,
   },
   progressTrack: {
@@ -413,14 +374,13 @@ const styles = StyleSheet.create({
   },
   skeletonWrapper: {
     paddingHorizontal: PADDING,
-    marginTop: 8,
   },
   skeletonLabel: {
     width: 80,
     height: 12,
     borderRadius: 6,
     backgroundColor: colors.secondary,
-    marginBottom: 10,
+    marginBottom: 8,
   },
   skeletonCard: {
     width: CARD_WIDTH,
@@ -432,7 +392,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    gap: 12,
+    gap: 2,
     paddingBottom: 80,
   },
   emptyTitle: {
