@@ -8,6 +8,7 @@ import colors from "@/constants/colors";
 import { signOut } from "@/services/auth";
 import { supabase } from "@/lib/supabase";
 import Button from "@/components/Button";
+import ExpCard from "@/components/ExpCard";
 
 type UserData = {
   name: string;
@@ -49,6 +50,7 @@ export default function UserProfileHome() {
           <Text style={styles.greeting}>👋 Halo, {user.name}</Text>
           <Text style={styles.email}>{user.email}</Text>
         </View>
+        <ExpCard variant="compact" />
       </View>
 
       <Button

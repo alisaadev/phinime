@@ -1,11 +1,5 @@
-// ============================================================
-// screens/ProfileScreen.tsx
-// Banner + avatar + stats real + menu + easter egg
-// ============================================================
-
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState, useCallback } from "react";
 import {
@@ -18,9 +12,11 @@ import {
   ActivityIndicator,
 } from "react-native";
 
+import Icon from "@/components/Icon";
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import { supabase } from "@/lib/supabase";
+import ExpCard from "@/components/ExpCard";
 import { getWatchHistory } from "@/services/history";
 import { getBookmarks } from "@/services/bookmark";
 
@@ -28,7 +24,6 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const BANNER_HEIGHT = 110;
 const AVATAR_SIZE = 72;
 
-// ─── Types ───────────────────────────────────────────────────
 interface ProfileData {
   name: string;
   email: string;
@@ -41,7 +36,14 @@ interface Stats {
   completed: number;
 }
 
-// ─── Helpers ─────────────────────────────────────────────────
+interface MenuItemProps {
+  icon: string;
+  label: string;
+  onPress: () => void;
+  danger?: boolean;
+  secret?: boolean;
+}
+
 function getInitials(name: string): string {
   return name
     .split(" ")
@@ -51,7 +53,6 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
-// ─── Stat Card ───────────────────────────────────────────────
 function StatCard({ value, label }: { value: number; label: string }) {
   return (
     <View style={styles.statCard}>
@@ -59,15 +60,6 @@ function StatCard({ value, label }: { value: number; label: string }) {
       <Text style={styles.statLabel}>{label}</Text>
     </View>
   );
-}
-
-// ─── Menu Item ───────────────────────────────────────────────
-interface MenuItemProps {
-  icon: string;
-  label: string;
-  onPress: () => void;
-  danger?: boolean;
-  secret?: boolean;
 }
 
 function MenuItem({ icon, label, onPress, danger, secret }: MenuItemProps) {
@@ -84,7 +76,7 @@ function MenuItem({ icon, label, onPress, danger, secret }: MenuItemProps) {
           secret && styles.menuIconSecret,
         ]}
       >
-        <Ionicons
+        <Icon
           name={icon as any}
           size={18}
           color={secret ? "#FFD700" : danger ? "#F87171" : colors.text}
@@ -99,8 +91,8 @@ function MenuItem({ icon, label, onPress, danger, secret }: MenuItemProps) {
       >
         {label}
       </Text>
-      <Ionicons
-        name="chevron-forward"
+      <Icon
+        name="ChevronRight"
         size={14}
         color={secret ? "#FFD700" : danger ? "#F87171" : colors.textDark}
       />
@@ -108,7 +100,6 @@ function MenuItem({ icon, label, onPress, danger, secret }: MenuItemProps) {
   );
 }
 
-// ─── Main Screen ──────────────────────────────────────────────
 export default function ProfileScreen() {
   const router = useRouter();
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -138,7 +129,6 @@ export default function ProfileScreen() {
 
       setProfile({ name, email, avatarUrl });
 
-      // Fetch stats paralel
       const [history, bookmarkList] = await Promise.all([
         getWatchHistory(uid, 1000),
         getBookmarks(uid),
@@ -183,7 +173,6 @@ export default function ProfileScreen() {
     setAvatarLoading(true);
 
     try {
-      // Upload ke Supabase Storage
       const { data: authData } = await supabase.auth.getUser();
       const uid = authData.user?.id;
       if (!uid) return;
@@ -206,7 +195,6 @@ export default function ProfileScreen() {
 
       const publicUrl = urlData.publicUrl;
 
-      // Update user metadata
       await supabase.auth.updateUser({
         data: { avatar_url: publicUrl },
       });
@@ -238,7 +226,6 @@ export default function ProfileScreen() {
     router.push("/settings");
   }, [router]);
 
-  // Easter egg — makin sering diklik makin aneh
   const handleEasterEgg = useCallback(() => {
     const count = easterEggCount + 1;
     setEasterEggCount(count);
@@ -273,17 +260,11 @@ export default function ProfileScreen() {
   const initials = getInitials(profile?.name ?? "?");
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Banner */}
+    <View style={styles.container}>
       <View style={styles.banner}>
         <View style={styles.bannerGradient} />
       </View>
 
-      {/* Avatar */}
       <View style={styles.avatarWrapper}>
         <TouchableOpacity
           style={styles.avatarContainer}
@@ -302,25 +283,23 @@ export default function ProfileScreen() {
               <Text style={styles.avatarInitials}>{initials}</Text>
             </View>
           )}
-          {/* Edit overlay */}
           <View style={styles.avatarEditBadge}>
             {avatarLoading ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Ionicons name="camera" size={12} color="#fff" />
+              <Icon name="Camera" size={12} color="#fff" />
             )}
           </View>
         </TouchableOpacity>
       </View>
 
-      {/* Name & Email */}
       <View style={styles.identity}>
         <Text style={styles.name}>{profile?.name}</Text>
         <Text style={styles.email}>{profile?.email}</Text>
       </View>
 
-      {/* Stats */}
       <View style={styles.statsRow}>
+        <ExpCard variant="full" />
         <StatCard value={stats.watched} label="Ditonton" />
         <View style={styles.statDivider} />
         <StatCard value={stats.bookmarks} label="Bookmark" />
@@ -328,18 +307,17 @@ export default function ProfileScreen() {
         <StatCard value={stats.completed} label="Selesai" />
       </View>
 
-      {/* Menu */}
       <View style={styles.menuSection}>
         <Text style={styles.menuSectionTitle}>PENGATURAN</Text>
         <View style={styles.menuCard}>
           <MenuItem
-            icon="settings-outline"
+            icon="Settings"
             label="Pengaturan"
             onPress={handleSettings}
           />
           <View style={styles.menuDivider} />
           <MenuItem
-            icon="log-out-outline"
+            icon="LogOut"
             label="Sign Out"
             onPress={handleSignOut}
             danger
@@ -347,28 +325,25 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      {/* Easter egg */}
       <View style={styles.menuSection}>
         <Text style={styles.menuSectionTitle}>???</Text>
         <View style={styles.menuCard}>
           <MenuItem
-            icon="warning-outline"
+            icon="TriangleAlert"
             label="Don't click this"
             onPress={handleEasterEgg}
             secret
           />
         </View>
       </View>
-
-      <View style={{ height: 100 }} />
-    </ScrollView>
+    </View>
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: "100%",
     backgroundColor: colors.background,
   },
   content: {
@@ -380,8 +355,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: colors.background,
   },
-
-  // Banner
   banner: {
     height: BANNER_HEIGHT,
     backgroundColor: colors.secondary,
@@ -393,8 +366,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
     opacity: 0.15,
   },
-
-  // Avatar
   avatarWrapper: {
     alignItems: "flex-start",
     paddingHorizontal: 20,
@@ -439,8 +410,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.background,
   },
-
-  // Identity
   identity: {
     paddingHorizontal: 20,
     marginBottom: 16,
@@ -455,8 +424,6 @@ const styles = StyleSheet.create({
     color: colors.textDark,
     marginTop: 2,
   },
-
-  // Stats
   statsRow: {
     flexDirection: "row",
     marginHorizontal: 16,
@@ -485,8 +452,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.1)",
     marginVertical: 4,
   },
-
-  // Menu
   menuSection: {
     marginHorizontal: 16,
     marginBottom: 16,

@@ -9,6 +9,10 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "cache": {
+        "key": "fingerprint-cache-v1",
+        "paths": [".expo", "node_modules/.cache"]
       }
     },
     "preview": {

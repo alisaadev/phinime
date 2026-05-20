@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { View, StyleSheet, Animated } from "react-native";
+import { useRef, useState, useCallback } from "react";
+import { View, StyleSheet, Animated, RefreshControl } from "react-native";
 
 import colors from "@/constants/colors";
 import GenreList from "@/components/GenreList";
@@ -11,11 +11,23 @@ import UserProfileHome from "@/components/UserProfileHome";
 
 export default function Home() {
   const scrollY = useRef(new Animated.Value(0)).current;
+  const scrollRef = useRef<Animated.ScrollView>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+    setRefreshKey((prev) => prev + 1);
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    setRefreshing(false);
+  }, []);
 
   return (
     <View style={styles.container}>
       <HomeHeader scrollY={scrollY} />
       <Animated.ScrollView
+        ref={scrollRef}
         style={{ flex: 1 }}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -23,20 +35,29 @@ export default function Home() {
         )}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.accent}
+            colors={[colors.accent]}
+            progressBackgroundColor={colors.secondary}
+          />
+        }
       >
-        <AnimeTop />
+        <AnimeTop key={`top-${refreshKey}`} />
         <View style={styles.barrier} />
 
         <UserProfileHome />
         <View style={styles.barrier} />
 
-        <GenreList />
+        <GenreList key={`genre-${refreshKey}`} />
         <View style={styles.barrier} />
 
-        <AnimeRecent />
+        <AnimeRecent key={`recent-${refreshKey}`} />
         <View style={styles.barrier} />
 
-        <AnimeCompleted />
+        <AnimeCompleted key={`completed-${refreshKey}`} />
         <View style={styles.barrier} />
 
         <View style={styles.padding} />

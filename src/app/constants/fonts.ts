@@ -1,15 +1,15 @@
 const fontMap: Record<string, string> = {
-  "100": "Montserrat-Regular",
-  "200": "Montserrat-Regular",
-  "300": "Montserrat-Regular",
-  "400": "Montserrat-Regular",
-  "500": "Montserrat-Medium",
-  "600": "Montserrat-SemiBold",
-  "700": "Montserrat-Bold",
-  "800": "Montserrat-ExtraBold",
-  "900": "Montserrat-ExtraBold",
-  normal: "Montserrat-Regular",
-  bold: "Montserrat-Bold",
+  "100": "Circular-Regular",
+  "200": "Circular-Regular",
+  "300": "Circular-Regular",
+  "400": "Circular-Regular",
+  "500": "Circular-Medium",
+  "600": "Circular-SemiBold",
+  "700": "Circular-Bold",
+  "800": "Circular-ExtraBold",
+  "900": "Circular-ExtraBold",
+  normal: "Circular-Regular",
+  bold: "Circular-Bold",
 };
 
 export default fontMap;
