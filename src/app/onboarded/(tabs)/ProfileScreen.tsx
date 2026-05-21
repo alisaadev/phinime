@@ -1,11 +1,11 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
-import { useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import {
   View,
   StyleSheet,
-  ScrollView,
+  Animated,
   TouchableOpacity,
   Dimensions,
   Alert,
@@ -17,6 +17,7 @@ import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import { supabase } from "@/lib/supabase";
 import Loader from "@/components/Loader";
+import Header from "@/components/Header";
 import ExpCard from "@/components/ExpCard";
 import { getBookmarks } from "@/services/bookmark";
 import { getWatchHistory } from "@/services/history";
@@ -24,8 +25,6 @@ import { getUserExp, UserExp } from "@/services/exp";
 import RankAvatarBorder from "@/components/RankAvatarBorder";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const BANNER_HEIGHT = 110;
-const AVATAR_SIZE = 72;
 
 interface ProfileData {
   name: string;
@@ -105,6 +104,8 @@ function MenuItem({ icon, label, onPress, danger, secret }: MenuItemProps) {
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const scroll = useRef(new Animated.Value(0)).current;
+  const scrollRef = useRef<Animated.ScrollView>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [expData, setExpData] = useState<UserExp | null>(null);
   const [stats, setStats] = useState<Stats>({
@@ -167,7 +168,7 @@ export default function ProfileScreen() {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
@@ -267,76 +268,84 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.banner}>
-        <View style={styles.bannerGradient} />
-      </View>
+      <Header title="profile" scroll={scroll} />
+      <Animated.ScrollView
+        ref={scrollRef}
+        style={{ flex: 1 }}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scroll } } }],
+          { useNativeDriver: false },
+        )}
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+      >
+        <View style={styles.profileHeader}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={handlePickAvatar}
+            disabled={avatarLoading}
+            style={styles.avatarContainer}
+          >
+            <RankAvatarBorder
+              rank={(expData?.rank as 1 | 2 | 3 | 4) ?? 1}
+              avatarUrl={profile?.avatarUrl ?? null}
+              initials={initials}
+              size={100}
+            />
+            <View style={styles.avatarEditBadge}>
+              {avatarLoading ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Icon name="Camera" size={12} color="#fff" />
+              )}
+            </View>
+          </TouchableOpacity>
 
-      <View style={styles.avatarWrapper}>
-        <TouchableOpacity
-          style={styles.avatarContainer}
-          activeOpacity={0.8}
-          onPress={handlePickAvatar}
-          disabled={avatarLoading}
-        >
-          <RankAvatarBorder
-            rank={(expData?.rank as 1 | 2 | 3 | 4) ?? 1}
-            avatarUrl={profile?.avatarUrl ?? null}
-            initials={initials}
-            size={100}
-          />
-          <View style={styles.avatarEditBadge}>
-            {avatarLoading ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Icon name="Camera" size={12} color="#fff" />
-            )}
+          <Text style={styles.name}>{profile?.name}</Text>
+          <Text style={styles.email}>{profile?.email}</Text>
+        </View>
+
+        <View style={styles.statsRow}>
+          <StatCard value={stats.watched} label="Ditonton" />
+          <View style={styles.statDivider} />
+          <StatCard value={stats.bookmarks} label="Bookmark" />
+          <View style={styles.statDivider} />
+          <StatCard value={stats.completed} label="Selesai" />
+        </View>
+
+        <ExpCard variant="full" />
+        <View style={styles.menuSection}>
+          <Text style={styles.menuSectionTitle}>PENGATURAN</Text>
+          <View style={styles.menuCard}>
+            <MenuItem
+              icon="Settings"
+              label="Pengaturan"
+              onPress={handleSettings}
+            />
+            <View style={styles.menuDivider} />
+            <MenuItem
+              icon="LogOut"
+              label="Sign Out"
+              onPress={handleSignOut}
+              danger
+            />
           </View>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.identity}>
-        <Text style={styles.name}>{profile?.name}</Text>
-        <Text style={styles.email}>{profile?.email}</Text>
-      </View>
-
-      <View style={styles.statsRow}>
-        <StatCard value={stats.watched} label="Ditonton" />
-        <View style={styles.statDivider} />
-        <StatCard value={stats.bookmarks} label="Bookmark" />
-        <View style={styles.statDivider} />
-        <StatCard value={stats.completed} label="Selesai" />
-      </View>
-      <ExpCard variant="full" />
-
-      <View style={styles.menuSection}>
-        <Text style={styles.menuSectionTitle}>PENGATURAN</Text>
-        <View style={styles.menuCard}>
-          <MenuItem
-            icon="Settings"
-            label="Pengaturan"
-            onPress={handleSettings}
-          />
-          <View style={styles.menuDivider} />
-          <MenuItem
-            icon="LogOut"
-            label="Sign Out"
-            onPress={handleSignOut}
-            danger
-          />
         </View>
-      </View>
 
-      <View style={styles.menuSection}>
-        <Text style={styles.menuSectionTitle}>???</Text>
-        <View style={styles.menuCard}>
-          <MenuItem
-            icon="TriangleAlert"
-            label="Don't click this"
-            onPress={handleEasterEgg}
-            secret
-          />
+        <View style={styles.menuSection}>
+          <Text style={styles.menuSectionTitle}>???</Text>
+          <View style={styles.menuCard}>
+            <MenuItem
+              icon="TriangleAlert"
+              label="Don't click this"
+              onPress={handleEasterEgg}
+              secret
+            />
+          </View>
         </View>
-      </View>
+
+        <View style={styles.padding} />
+      </Animated.ScrollView>
     </View>
   );
 }
@@ -353,52 +362,40 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: colors.background,
   },
-  banner: {
-    height: BANNER_HEIGHT,
-    backgroundColor: colors.secondary,
-    position: "relative",
-    overflow: "hidden",
-  },
-  bannerGradient: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.accent,
-    opacity: 0.15,
-  },
-  avatarWrapper: {
-    alignItems: "flex-start",
-    marginHorizontal: 4,
-    marginTop: -(AVATAR_SIZE / 2),
-    marginBottom: 10,
+  profileHeader: {
+    alignItems: "center",
+    paddingTop: 28,
+    paddingBottom: 24,
+    paddingHorizontal: 20,
   },
   avatarContainer: {
     position: "relative",
+    marginBottom: 14,
   },
   avatarEditBadge: {
     position: "absolute",
     bottom: 2,
     right: 2,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     backgroundColor: colors.accent,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 2,
     borderColor: colors.background,
   },
-  identity: {
-    paddingHorizontal: 20,
-    marginBottom: 16,
-  },
   name: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "800",
     color: colors.text,
+    textAlign: "center",
   },
   email: {
-    fontSize: 12,
+    fontSize: 13,
     color: colors.textDark,
-    marginTop: 2,
+    marginTop: 4,
+    textAlign: "center",
   },
   statsRow: {
     flexDirection: "row",
@@ -431,6 +428,7 @@ const styles = StyleSheet.create({
   menuSection: {
     marginHorizontal: 16,
     marginBottom: 16,
+    marginTop: 6,
   },
   menuSectionTitle: {
     fontSize: 10,
@@ -482,5 +480,8 @@ const styles = StyleSheet.create({
   },
   menuLabelSecret: {
     color: "#FFD700",
+  },
+  padding: {
+    marginBottom: "24%",
   },
 });

@@ -135,38 +135,6 @@ export async function getEpisodeProgress(
 }
 
 /**
- * Hapus satu item history.
- */
-export async function deleteWatchHistory(
-  userId: string,
-  episodeId: string,
-): Promise<void> {
-  const { error } = await supabase
-    .from("watch_history")
-    .delete()
-    .eq("user_id", userId)
-    .eq("episode_id", episodeId);
-
-  if (error) {
-    console.error("[History] Gagal hapus history:", error.message);
-  }
-}
-
-/**
- * Hapus semua history user.
- */
-export async function clearWatchHistory(userId: string): Promise<void> {
-  const { error } = await supabase
-    .from("watch_history")
-    .delete()
-    .eq("user_id", userId);
-
-  if (error) {
-    console.error("[History] Gagal hapus semua history:", error.message);
-  }
-}
-
-/**
  * Ambil history per anime (semua episode yang pernah ditonton dari satu anime).
  */
 export async function getAnimeWatchHistory(

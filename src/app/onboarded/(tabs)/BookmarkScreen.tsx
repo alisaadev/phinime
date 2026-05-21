@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { useEffect, useState, useCallback, memo } from "react";
+import { useRef, useEffect, useState, useCallback, memo } from "react";
 import {
   View,
   StyleSheet,
@@ -9,12 +9,15 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
+  Animated,
 } from "react-native";
 
 import Icon from "@/components/Icon";
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import { supabase } from "@/lib/supabase";
+import Loader from "@/components/Loader";
+import Header from "@/components/Header";
 import {
   getBookmarks,
   removeBookmark,
@@ -32,16 +35,6 @@ interface CardProps {
   item: Bookmark;
   onPress: (item: Bookmark) => void;
   onLongPress: (item: Bookmark) => void;
-}
-
-function SkeletonGrid() {
-  return (
-    <View style={styles.skeletonWrapper}>
-      {[...Array(2)].map((_, i) => (
-        <View key={i} style={styles.skeletonCard} />
-      ))}
-    </View>
-  );
 }
 
 function EmptyState() {
@@ -112,6 +105,8 @@ const BookmarkCard = memo(({ item, onPress, onLongPress }: CardProps) => {
 
 export default function BookmarkScreen() {
   const router = useRouter();
+  const scroll = useRef(new Animated.Value(0)).current;
+  const scrollRef = useRef<Animated.ScrollView>(null);
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
@@ -196,12 +191,7 @@ export default function BookmarkScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.pill}>
-          <View style={styles.pillContent}>
-            <Text style={styles.headerTitle}>Bookmark</Text>
-          </View>
-        </View>
+      <Header title="bookmark" scroll={scroll}>
         <View style={styles.headerRight}>
           {bookmarks.length > 0 && (
             <Text style={styles.countText}>{bookmarks.length} anime</Text>
@@ -210,27 +200,40 @@ export default function BookmarkScreen() {
             <Text style={styles.clearBtn}>Hapus semua</Text>
           </TouchableOpacity>
         </View>
-      </View>
-
-      {loading ? (
-        <SkeletonGrid />
-      ) : bookmarks.length === 0 ? (
-        <EmptyState />
-      ) : (
-        <FlatList
-          data={bookmarks}
-          renderItem={renderItem}
-          keyExtractor={keyExtractor}
-          numColumns={2}
-          columnWrapperStyle={styles.row}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-          removeClippedSubviews
-          initialNumToRender={6}
-          maxToRenderPerBatch={6}
-          windowSize={5}
-        />
-      )}
+      </Header>
+      <Animated.ScrollView
+        ref={scrollRef}
+        style={{ flex: 1 }}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scroll } } }],
+          { useNativeDriver: false },
+        )}
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+      >
+        {loading ? (
+          <View style={styles.loadingWrapper}>
+            <Loader visible={loading} />
+          </View>
+        ) : bookmarks.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <FlatList
+            data={bookmarks}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
+            numColumns={2}
+            columnWrapperStyle={styles.row}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+            removeClippedSubviews
+            initialNumToRender={6}
+            maxToRenderPerBatch={6}
+            windowSize={5}
+          />
+        )}
+        <View style={styles.padding} />
+      </Animated.ScrollView>
     </View>
   );
 }
@@ -239,33 +242,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-  },
-  header: {
-    zIndex: 10,
-    height: 56,
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: PADDING,
-  },
-  pill: {
-    height: 40,
-    backgroundColor: colors.secondary,
-    borderRadius: 20,
-    borderWidth: 0.8,
-    borderColor: "rgba(255,255,255,0.2)",
-    justifyContent: "center",
-  },
-  pillContent: {
-    paddingHorizontal: 17,
-    gap: 8,
-  },
-  headerTitle: {
-    color: colors.text,
-    fontSize: 18,
-    fontWeight: "800",
-    letterSpacing: 0.5,
   },
   headerRight: {
     alignItems: "flex-end",
@@ -341,17 +317,11 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: colors.text,
   },
-  skeletonWrapper: {
-    flexDirection: "row",
-    paddingHorizontal: PADDING,
-    gap: GAP,
-  },
-  skeletonCard: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
-    borderRadius: 14,
-    backgroundColor: colors.secondary,
-    marginBottom: GAP,
+  loadingWrapper: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: colors.background,
   },
   emptyWrapper: {
     flex: 1,
@@ -371,5 +341,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     paddingHorizontal: 40,
     lineHeight: 20,
+  },
+  padding: {
+    marginBottom: "24%",
   },
 });

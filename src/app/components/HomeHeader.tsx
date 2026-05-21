@@ -30,7 +30,7 @@ export default function HomeHeader({ scrollY }: Props) {
 
   const animatedWidth = pillWidth.interpolate({
     inputRange: [0, 1],
-    outputRange: ["33%", "85%"],
+    outputRange: ["30%", "85%"],
   });
 
   const backgroundColor = scrollY.interpolate({
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   pillContent: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 17,
+    paddingHorizontal: 15,
     justifyContent: "center",
     gap: 8,
   },
