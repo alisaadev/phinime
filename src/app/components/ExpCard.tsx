@@ -184,14 +184,13 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   rankName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "800",
     letterSpacing: 0.3,
   },
   rankProfileText: {
-    fontSize: 11,
+    fontSize: 14,
     color: colors.textDark,
-    marginTop: 3,
     fontStyle: "italic",
   },
   levelBadge: {

@@ -40,39 +40,45 @@ export default function UserProfileHome() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.left}>
-        <Image
-          source={{ uri: user.avatar }}
-          style={styles.avatar}
-          contentFit="cover"
-        />
-        <View>
-          <Text style={styles.greeting}>👋 Halo, {user.name}</Text>
-          <Text style={styles.email}>{user.email}</Text>
+      <View style={styles.profileContainer}>
+        <View style={styles.left}>
+          <Image
+            source={{ uri: user.avatar }}
+            style={styles.avatar}
+            contentFit="cover"
+          />
+          <View>
+            <Text style={styles.greeting}>👋 Halo, {user.name}</Text>
+            <Text style={styles.email}>{user.email}</Text>
+          </View>
         </View>
-        <ExpCard variant="compact" />
+
+        <Button
+          title="Sign Out"
+          text={styles.logoutText}
+          button={styles.logoutButton}
+          onPress={handleSignOut}
+        />
       </View>
 
-      <Button
-        title="Sign Out"
-        text={styles.logoutText}
-        button={styles.logoutButton}
-        onPress={handleSignOut}
-      />
+      <ExpCard variant="compact" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 14,
     backgroundColor: colors.secondary,
     borderRadius: 20,
     marginHorizontal: 12,
+  },
+  profileContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 16,
   },
   left: {
     flexDirection: "row",

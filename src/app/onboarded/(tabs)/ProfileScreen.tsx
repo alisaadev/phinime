@@ -216,14 +216,14 @@ export default function ProfileScreen() {
         style: "destructive",
         onPress: async () => {
           await supabase.auth.signOut();
-          router.replace("/login");
+          router.replace("/onboarded/login");
         },
       },
     ]);
   }, [router]);
 
   const handleSettings = useCallback(() => {
-    router.push("/settings");
+    router.push("/");
   }, [router]);
 
   const handleEasterEgg = useCallback(() => {
@@ -299,13 +299,13 @@ export default function ProfileScreen() {
       </View>
 
       <View style={styles.statsRow}>
-        <ExpCard variant="full" />
         <StatCard value={stats.watched} label="Ditonton" />
         <View style={styles.statDivider} />
         <StatCard value={stats.bookmarks} label="Bookmark" />
         <View style={styles.statDivider} />
         <StatCard value={stats.completed} label="Selesai" />
       </View>
+      <ExpCard variant="full" />
 
       <View style={styles.menuSection}>
         <Text style={styles.menuSectionTitle}>PENGATURAN</Text>
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary,
     borderRadius: 16,
     padding: 16,
-    marginBottom: 24,
+    marginBottom: 10,
   },
   statCard: {
     flex: 1,
