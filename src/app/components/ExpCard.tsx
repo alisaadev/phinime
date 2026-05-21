@@ -8,7 +8,6 @@ import {
   getUserExp,
   getLevelProgress,
   expRequiredForLevel,
-  getRankFromLevel,
   RANKS,
   MAX_LEVEL,
   UserExp,
@@ -46,11 +45,7 @@ function ExpProgressBar({
   );
 }
 
-interface ExpCardProps {
-  variant?: "compact" | "full";
-}
-
-function ExpCard({ variant = "full" }: ExpCardProps) {
+function ExpCard({ variant = "full" }: { variant?: "compact" | "full" }) {
   const [expData, setExpData] = useState<UserExp | null>(null);
   const [loading, setLoading] = useState(true);
 

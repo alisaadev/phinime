@@ -16,9 +16,11 @@ import Icon from "@/components/Icon";
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import { supabase } from "@/lib/supabase";
+import Loader from "@/components/Loader";
 import ExpCard from "@/components/ExpCard";
-import { getWatchHistory } from "@/services/history";
 import { getBookmarks } from "@/services/bookmark";
+import { getWatchHistory } from "@/services/history";
+import { getUserExp, UserExp } from "@/services/exp";
 import RankAvatarBorder from "@/components/RankAvatarBorder";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -104,6 +106,7 @@ function MenuItem({ icon, label, onPress, danger, secret }: MenuItemProps) {
 export default function ProfileScreen() {
   const router = useRouter();
   const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [expData, setExpData] = useState<UserExp | null>(null);
   const [stats, setStats] = useState<Stats>({
     watched: 0,
     bookmarks: 0,
@@ -130,15 +133,17 @@ export default function ProfileScreen() {
 
       setProfile({ name, email, avatarUrl });
 
-      const [history, bookmarkList] = await Promise.all([
+      const [history, bookmarkList, exp] = await Promise.all([
         getWatchHistory(uid, 1000),
         getBookmarks(uid),
+        getUserExp(uid),
       ]);
 
       const completed = history.filter(
         (h) => h.duration_ms > 0 && h.progress_ms / h.duration_ms >= 0.9,
       ).length;
 
+      setExpData(exp);
       setStats({
         watched: history.length,
         bookmarks: bookmarkList.length,
@@ -253,7 +258,7 @@ export default function ProfileScreen() {
   if (loading) {
     return (
       <View style={styles.loadingWrapper}>
-        <ActivityIndicator size="large" color={colors.accent} />
+        <Loader visible={loading} />
       </View>
     );
   }
@@ -273,17 +278,12 @@ export default function ProfileScreen() {
           onPress={handlePickAvatar}
           disabled={avatarLoading}
         >
-          {profile?.avatarUrl ? (
-            <Image
-              source={{ uri: profile.avatarUrl }}
-              style={styles.avatar}
-              contentFit="cover"
-            />
-          ) : (
-            <View style={styles.avatarPlaceholder}>
-              <Text style={styles.avatarInitials}>{initials}</Text>
-            </View>
-          )}
+          <RankAvatarBorder
+            rank={(expData?.rank as 1 | 2 | 3 | 4) ?? 1}
+            avatarUrl={profile?.avatarUrl ?? null}
+            initials={initials}
+            size={100}
+          />
           <View style={styles.avatarEditBadge}>
             {avatarLoading ? (
               <ActivityIndicator size="small" color="#fff" />
@@ -347,9 +347,6 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: colors.background,
   },
-  content: {
-    paddingBottom: 40,
-  },
   loadingWrapper: {
     flex: 1,
     justifyContent: "center",
@@ -369,34 +366,12 @@ const styles = StyleSheet.create({
   },
   avatarWrapper: {
     alignItems: "flex-start",
-    paddingHorizontal: 20,
+    marginHorizontal: 4,
     marginTop: -(AVATAR_SIZE / 2),
     marginBottom: 10,
   },
   avatarContainer: {
     position: "relative",
-  },
-  avatar: {
-    width: AVATAR_SIZE,
-    height: AVATAR_SIZE,
-    borderRadius: AVATAR_SIZE / 2,
-    borderWidth: 3,
-    borderColor: colors.background,
-  },
-  avatarPlaceholder: {
-    width: AVATAR_SIZE,
-    height: AVATAR_SIZE,
-    borderRadius: AVATAR_SIZE / 2,
-    backgroundColor: colors.secondary,
-    borderWidth: 3,
-    borderColor: colors.background,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  avatarInitials: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: colors.accent,
   },
   avatarEditBadge: {
     position: "absolute",

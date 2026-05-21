@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     marginBottom: 12,
   },
   sectionTitle: {
@@ -147,8 +147,8 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   listContent: {
-    paddingHorizontal: 12,
-    gap: 12,
+    paddingHorizontal: 16,
+    gap: 10,
   },
   card: {
     width: CARD_WIDTH,

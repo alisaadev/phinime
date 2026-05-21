@@ -23,7 +23,7 @@ import {
 } from "@/services/bookmark";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const PADDING = 12;
+const PADDING = 16;
 const GAP = 10;
 const CARD_WIDTH = (SCREEN_WIDTH - PADDING * 2 - GAP) / 2;
 const CARD_HEIGHT = CARD_WIDTH * 1.5;

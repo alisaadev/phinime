@@ -24,7 +24,7 @@ import {
 } from "@/services/history";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const PADDING = 12;
+const PADDING = 16;
 const GAP = 6;
 const CARD_WIDTH = (SCREEN_WIDTH - PADDING * 2 - GAP * 2) / 3;
 const CARD_HEIGHT = CARD_WIDTH * 1.5;
@@ -300,9 +300,10 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     marginBottom: 8,
+    marginLeft: 4
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: 10,
     fontWeight: "700",
     color: colors.textSecondary,
     letterSpacing: 0.3,
@@ -310,7 +311,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     gap: GAP,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   card: {
     width: CARD_WIDTH,

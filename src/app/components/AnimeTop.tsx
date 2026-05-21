@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
   },
   skeletonWrapper: {
     marginTop: 56,
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
   },
   skeletonCard: {
     width: CARD_WIDTH,

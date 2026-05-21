@@ -169,7 +169,7 @@ export default function AnimeCompleted() {
 const styles = StyleSheet.create({
   wrapper: {
     marginTop: 8,
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
   },
   header: {
     flexDirection: "row",

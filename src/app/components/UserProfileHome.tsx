@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     backgroundColor: colors.secondary,
     borderRadius: 20,
-    marginHorizontal: 12,
+    marginHorizontal: 16,
   },
   profileContainer: {
     flexDirection: "row",
