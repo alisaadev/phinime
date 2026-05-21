@@ -12,7 +12,7 @@ type Props = {
 export default function Header({ title, scroll }: Props) {
   const backgroundColor = scroll.interpolate({
     inputRange: [0, 100],
-    outputRange: ["transparent", colors.background],
+    outputRange: ["rgba(26,26,41,0)", colors.background],
     extrapolate: "clamp",
   });
 

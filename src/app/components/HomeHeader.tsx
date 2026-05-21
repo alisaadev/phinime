@@ -35,7 +35,7 @@ export default function HomeHeader({ scrollY }: Props) {
 
   const backgroundColor = scrollY.interpolate({
     inputRange: [0, 100],
-    outputRange: ["transparent", colors.background],
+    outputRange: ["rgba(26,26,41,0)", colors.background],
     extrapolate: "clamp",
   });
 

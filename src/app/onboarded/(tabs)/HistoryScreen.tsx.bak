@@ -216,14 +216,17 @@ export default function HistoryScreen() {
     [],
   );
 
-  return (
-    <View style={styles.container}>
-      <Header title="history" scroll={scroll} />
-      {loading ? (
+    if (loading) {
+      return (
         <View style={styles.loadingWrapper}>
           <Loader visible={loading} />
         </View>
-      ) : (
+      );
+    }
+
+  return (
+    <View style={styles.container}>
+      <Header title="history" scroll={scroll} />
       <Animated.SectionList
         ref={scrollRef}
         sections={loading ? [] : sections}
@@ -245,7 +248,6 @@ export default function HistoryScreen() {
         ListEmptyComponent={!loading ? <EmptyState /> : null}
         ListFooterComponent={<View style={styles.padding} />}
       />
-      )}
     </View>
   );
 }

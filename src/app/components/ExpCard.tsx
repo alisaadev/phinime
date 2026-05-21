@@ -162,8 +162,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   skeletonCompact: {
-    height: 48,
-    marginHorizontal: 0,
+    height: 0,
   },
   card: {
     backgroundColor: colors.secondary,

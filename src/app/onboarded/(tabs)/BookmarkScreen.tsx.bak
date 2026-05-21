@@ -183,6 +183,14 @@ export default function BookmarkScreen() {
 
   const keyExtractor = useCallback((item: Bookmark) => item.anime_id, []);
 
+    if (loading) {
+      return (
+        <View style={styles.loadingWrapper}>
+          <Loader visible={loading} />
+        </View>
+      );
+    }
+
   return (
     <View style={styles.container}>
       <Header title="bookmark" scroll={scroll} />
@@ -195,11 +203,6 @@ export default function BookmarkScreen() {
         </TouchableOpacity>
       </View>
 
-      {loading ? (
-        <View style={styles.loadingWrapper}>
-          <Loader visible={loading} />
-        </View>
-      ) : (
       <Animated.FlatList
         ref={scrollRef}
         data={loading ? [] : bookmarks}
@@ -221,7 +224,6 @@ export default function BookmarkScreen() {
         ListEmptyComponent={!loading ? <EmptyState /> : null}
         ListFooterComponent={<View style={styles.padding} />}
       />
-      )}
     </View>
   );
 }
