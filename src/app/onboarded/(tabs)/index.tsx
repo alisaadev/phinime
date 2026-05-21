@@ -13,10 +13,10 @@ import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import Navbar from "@/components/Navbar";
 
-import Home from "@/onboarded/(tabs)/home";
-import ProfileScreen from "@/screens/ProfileScreen";
-import HistoryScreen from "@/screens/HistoryScreen";
-import BookmarkScreen from "@/screens/BookmarkScreen";
+import HomeScreen from "@/onboarded/(tabs)/HomeScreen";
+import ProfileScreen from "@/onboarded/(tabs)/ProfileScreen";
+import HistoryScreen from "@/onboarded/(tabs)/HistoryScreen";
+import BookmarkScreen from "@/onboarded/(tabs)/BookmarkScreen";
 
 const TOTAL_TABS = 4;
 const SWIPE_THRESHOLD = 60;
@@ -94,7 +94,7 @@ export default function Index() {
               >
                 <View style={{ flex: 1 }}>
                   <FadeTab isActive={activeTab === 0}>
-                    <Home />
+                    <HomeScreen />
                   </FadeTab>
                   <FadeTab isActive={activeTab === 1}>
                     <HistoryScreen />

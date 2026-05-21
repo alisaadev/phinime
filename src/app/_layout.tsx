@@ -6,11 +6,11 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded] = useFonts({
-    "Montserrat-Regular": require("@/fonts/Montserrat-Regular.ttf"),
-    "Montserrat-Medium": require("@/fonts/Montserrat-Medium.ttf"),
-    "Montserrat-SemiBold": require("@/fonts/Montserrat-SemiBold.ttf"),
-    "Montserrat-Bold": require("@/fonts/Montserrat-Bold.ttf"),
-    "Montserrat-ExtraBold": require("@/fonts/Montserrat-ExtraBold.ttf"),
+    "Circular-Regular": require("@/fonts/Circular-Regular.ttf"),
+    "Circular-Medium": require("@/fonts/Circular-Medium.ttf"),
+    "Circular-SemiBold": require("@/fonts/Circular-SemiBold.ttf"),
+    "Circular-Bold": require("@/fonts/Circular-Bold.ttf"),
+    "Circular-ExtraBold": require("@/fonts/Circular-ExtraBold.ttf"),
   });
 
   useEffect(() => {
