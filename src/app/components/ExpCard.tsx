@@ -47,7 +47,6 @@ function ExpProgressBar({
 }
 
 interface ExpCardProps {
-  /** compact = versi kecil untuk Home, full = versi lengkap untuk Profile */
   variant?: "compact" | "full";
 }
 
