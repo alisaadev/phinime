@@ -19,6 +19,7 @@ import { supabase } from "@/lib/supabase";
 import ExpCard from "@/components/ExpCard";
 import { getWatchHistory } from "@/services/history";
 import { getBookmarks } from "@/services/bookmark";
+import RankAvatarBorder from "@/components/RankAvatarBorder";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const BANNER_HEIGHT = 110;
