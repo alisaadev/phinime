@@ -21,17 +21,33 @@ import { getSchedule } from "@/services/otakudesu";
 import BackButton from "@/components/BackButton";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const DAY_ORDER = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"];
-const JS_DAY_TO_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+const DAY_ORDER = [
+  "Senin",
+  "Selasa",
+  "Rabu",
+  "Kamis",
+  "Jumat",
+  "Sabtu",
+  "Minggu",
+];
+const JS_DAY_TO_ID = [
+  "Minggu",
+  "Senin",
+  "Selasa",
+  "Rabu",
+  "Kamis",
+  "Jumat",
+  "Sabtu",
+];
 
 const DAY_SHORT: Record<string, string> = {
-  Senin:   "Senin",
-  Selasa:  "Selasa",
-  Rabu:    "Rabu",
-  Kamis:   "Kamis",
-  Jumat:   "Jum'at",
-  Sabtu:   "Sabtu",
-  Minggu:  "Minggu",
+  Senin: "Senin",
+  Selasa: "Selasa",
+  Rabu: "Rabu",
+  Kamis: "Kamis",
+  Jumat: "Jum'at",
+  Sabtu: "Sabtu",
+  Minggu: "Minggu",
 };
 
 interface AnimeItem {
@@ -64,7 +80,10 @@ function DayPicker({ days, selected, onSelect }: DayPickerProps) {
   useEffect(() => {
     const idx = days.indexOf(selected);
     if (idx >= 0 && scrollRef.current) {
-      scrollRef.current.scrollTo({ x: idx * 72 - SCREEN_WIDTH / 2 + 36, animated: true });
+      scrollRef.current.scrollTo({
+        x: idx * 72 - SCREEN_WIDTH / 2 + 36,
+        animated: true,
+      });
     }
   }, [selected, days]);
 
@@ -79,7 +98,9 @@ function DayPicker({ days, selected, onSelect }: DayPickerProps) {
             activeOpacity={0.8}
             style={[styles.dayItem, isActive && styles.dayItemActive]}
           >
-            <Text style={[styles.dayNumber, isActive && styles.dayNumberActive]}>
+            <Text
+              style={[styles.dayNumber, isActive && styles.dayNumberActive]}
+            >
               {DAY_SHORT[day] ?? day}
             </Text>
           </TouchableOpacity>
@@ -119,7 +140,8 @@ function EmptyState({ day }: { day: string }) {
       <Icon name="CalendarX2" size={64} color={colors.accent} />
       <Text style={styles.emptyTitle}>Tidak ada jadwal</Text>
       <Text style={styles.emptySubtitle}>
-        Tak ada kisah yang menampakkan wujudnya di hari {day}. Namun jangan risau, esok ia akan kembali menyapamu.
+        Tak ada kisah yang menampakkan wujudnya di hari {day}. Namun jangan
+        risau, esok ia akan kembali menyapamu.
       </Text>
     </View>
   );
@@ -127,32 +149,32 @@ function EmptyState({ day }: { day: string }) {
 
 export default function ScheduleScreen() {
   const router = useRouter();
-  const [schedule, setSchedule]     = useState<ScheduleDay[]>([]);
+  const [schedule, setSchedule] = useState<ScheduleDay[]>([]);
   const [selectedDay, setSelectedDay] = useState<string>("");
-  const [loading, setLoading]       = useState(true);
+  const [loading, setLoading] = useState(true);
   const todayId = JS_DAY_TO_ID[new Date().getDay()];
 
   useEffect(() => {
     load();
   }, []);
-  
+
   async function load() {
-      try {
-        const res = await getSchedule();
-        const sorted = [...res.data].sort(
-          (a, b) => DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day)
-        );
+    try {
+      const res = await getSchedule();
+      const sorted = [...res.data].sort(
+        (a, b) => DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day),
+      );
 
-        setSchedule(sorted);
+      setSchedule(sorted);
 
-        const todayData = sorted.find((s) => s.day === todayId);
-        setSelectedDay(todayData ? todayId : sorted[0]?.day ?? "");
-      } catch (e) {
-        console.log("[Schedule] Gagal fetch", e)
-      } finally {
-        setLoading(false);
-      }
+      const todayData = sorted.find((s) => s.day === todayId);
+      setSelectedDay(todayData ? todayId : (sorted[0]?.day ?? ""));
+    } catch (e) {
+      console.log("[Schedule] Gagal fetch", e);
+    } finally {
+      setLoading(false);
     }
+  }
 
   const handlePress = useCallback(
     (slug: string) => {
@@ -162,7 +184,8 @@ export default function ScheduleScreen() {
   );
 
   const days = schedule.map((s) => s.day);
-  const activeList = schedule.find((s) => s.day === selectedDay)?.anime_list ?? [];
+  const activeList =
+    schedule.find((s) => s.day === selectedDay)?.anime_list ?? [];
   const keyExtractor = useCallback((item: AnimeItem) => item.slug, []);
 
   const renderItem = useCallback(
@@ -178,42 +201,42 @@ export default function ScheduleScreen() {
 
   return (
     <SafeAreaProvider>
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <BackButton title="Jadwal Tayang" />
-      </View>
-
-      {loading ? (
-        <View style={styles.dayPicker}>
-          {Array.from({ length: 8 }).map((_, i) => (
-            <View key={i} style={[styles.dayItem, { height: 34.2 }]} />
-          ))}
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <BackButton title="Jadwal Tayang" />
         </View>
-      ) : (
-        <DayPicker
-          days={days}
-          selected={selectedDay}
-          onSelect={setSelectedDay}
-        />
-      )}
 
-      <View style={styles.divider} />
-      {loading ? (
-        <View style={styles.loadingWrapper}>
-          <Loader visible={loading} />
-        </View>
-      ) : (
-        <FlatList
-          data={activeList}
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={<EmptyState day={selectedDay} />}
-          ListFooterComponent={<View style={{ marginBottom: "24%" }} />}
-        />
-      )}
-    </SafeAreaView>
+        {loading ? (
+          <View style={styles.dayPicker}>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <View key={i} style={[styles.dayItem, { height: 34.2 }]} />
+            ))}
+          </View>
+        ) : (
+          <DayPicker
+            days={days}
+            selected={selectedDay}
+            onSelect={setSelectedDay}
+          />
+        )}
+
+        <View style={styles.divider} />
+        {loading ? (
+          <View style={styles.loadingWrapper}>
+            <Loader visible={loading} />
+          </View>
+        ) : (
+          <FlatList
+            data={activeList}
+            keyExtractor={keyExtractor}
+            renderItem={renderItem}
+            contentContainerStyle={styles.listContainer}
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={<EmptyState day={selectedDay} />}
+            ListFooterComponent={<View style={{ marginBottom: "24%" }} />}
+          />
+        )}
+      </SafeAreaView>
     </SafeAreaProvider>
   );
 }
