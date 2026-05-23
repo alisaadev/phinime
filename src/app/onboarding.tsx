@@ -19,9 +19,9 @@ import {
 } from "@shopify/react-native-skia";
 
 import data from "@/constants/onboarding";
-import Pagination from "@/onboarded/Pagination";
-import RenderItem from "@/onboarded/RenderItem";
-import CustomButton from "@/onboarded/CustomButton";
+import Pagination from "@/components/onboarding/Pagination";
+import RenderItem from "@/components/onboarding/RenderItem";
+import CustomButton from "@/components/onboarding/CustomButton";
 
 export default function OnboardingScreen() {
   const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = useWindowDimensions();

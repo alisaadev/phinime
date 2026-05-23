@@ -7,8 +7,8 @@ import Icon from "@/components/Icon";
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import Loader from "@/components/Loader";
-import { getAnimeDetail, getHome } from "@/services/api";
-import type { AnimeDetail, CompletedAnime } from "@/services/api";
+import { getAnimeDetail, getHome } from "@/services/otakudesu";
+import type { AnimeDetail, CompletedAnime } from "@/services/otakudesu";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_HEIGHT = (SCREEN_WIDTH - 48) / 2.3;
@@ -56,7 +56,7 @@ const AnimeCard = memo(({ item, onPress }: AnimeCardProps) => {
           </View>
         </View>
 
-        <Text style={styles.title} numberOfLines={1}>
+        <Text style={styles.title} numberOfLines={2}>
           {item?.title}
         </Text>
 
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
-    gap: 4,
+    gap: 6,
   },
   metaBadge: {
     backgroundColor: colors.accent,
@@ -222,10 +222,10 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   title: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "700",
     color: colors.text,
-    lineHeight: 20,
+    lineHeight: 18,
   },
   genreRow: {
     flexDirection: "row",
@@ -263,9 +263,8 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   synopsis: {
-    fontSize: 8,
+    fontSize: 10,
     color: colors.textSecondary,
-    lineHeight: 17,
   },
   skeletonRow: {
     height: CARD_HEIGHT,

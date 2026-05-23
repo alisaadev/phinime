@@ -13,10 +13,10 @@ import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import Navbar from "@/components/Navbar";
 
-import HomeScreen from "@/onboarded/(tabs)/HomeScreen";
-import ProfileScreen from "@/onboarded/(tabs)/ProfileScreen";
-import HistoryScreen from "@/onboarded/(tabs)/HistoryScreen";
-import BookmarkScreen from "@/onboarded/(tabs)/BookmarkScreen";
+import HomeScreen from "./HomeScreen";
+import ProfileScreen from "./ProfileScreen";
+import HistoryScreen from "./HistoryScreen";
+import BookmarkScreen from "./BookmarkScreen";
 
 const TOTAL_TABS = 4;
 const SWIPE_THRESHOLD = 60;
@@ -89,8 +89,8 @@ export default function Index() {
             <BlurTargetView ref={blurTargetRef} style={styles.blurTarget}>
               <PanGestureHandler
                 onHandlerStateChange={onGestureEvent}
-                activeOffsetX={[-10, 10]}
-                failOffsetY={[-15, 15]}
+                activeOffsetX={[-25, 25]}
+                failOffsetY={[-10, 10]}
               >
                 <View style={{ flex: 1 }}>
                   <FadeTab isActive={activeTab === 0}>

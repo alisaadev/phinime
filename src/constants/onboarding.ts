@@ -12,7 +12,7 @@ export interface OnBoardingData {
 const OnBoarding: OnBoardingData[] = [
   {
     id: 1,
-    image: require("@/images/image_3.png"),
+    image: require("@/assets/images/image_3.png"),
     text: "Dunia Lain Menantimu",
     text2:
       "Ada semesta yang tak terjangkau mata, namun bisa dirasakan jiwa. PhiNime membawamu ke sana — gratis, tanpa batas, tanpa gangguan.",
@@ -21,7 +21,7 @@ const OnBoarding: OnBoardingData[] = [
   },
   {
     id: 2,
-    image: require("@/images/image_4.png"),
+    image: require("@/assets/images/image_4.png"),
     text: "Waktu Tak Pernah Jadi Penghalang",
     text2:
       "Seperti bintang yang selalu ada meski siang menutupinya, anime favoritmu selalu menunggu — kapan pun kamu siap untuk pulang.",
@@ -30,7 +30,7 @@ const OnBoarding: OnBoardingData[] = [
   },
   {
     id: 3,
-    image: require("@/images/image_2.png"),
+    image: require("@/assets/images/image_2.png"),
     text: "Setiap Hari, Sebuah Babak Baru",
     text2:
       "Cerita yang baik tidak pernah benar-benar berakhir. PhiNime memastikan perjalananmu terus berlanjut, satu episode demi satu episode.",
@@ -39,7 +39,7 @@ const OnBoarding: OnBoardingData[] = [
   },
   {
     id: 4,
-    image: require("@/images/image_1.png"),
+    image: require("@/assets/images/image_1.png"),
     text: "Miliki, Bukan Sekadar Melihat",
     text2:
       "Ada perbedaan antara melewati dan benar-benar hadir. Simpan momen itu, bawa ke mana pun kamu pergi — karena beberapa cerita layak untuk diulang.",

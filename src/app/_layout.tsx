@@ -6,11 +6,11 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded] = useFonts({
-    "Circular-Regular": require("@/fonts/Circular-Regular.ttf"),
-    "Circular-Medium": require("@/fonts/Circular-Medium.ttf"),
-    "Circular-SemiBold": require("@/fonts/Circular-SemiBold.ttf"),
-    "Circular-Bold": require("@/fonts/Circular-Bold.ttf"),
-    "Circular-ExtraBold": require("@/fonts/Circular-ExtraBold.ttf"),
+    "Circular-Regular": require("@/assets/fonts/Circular-Regular.ttf"),
+    "Circular-Medium": require("@/assets/fonts/Circular-Medium.ttf"),
+    "Circular-SemiBold": require("@/assets/fonts/Circular-SemiBold.ttf"),
+    "Circular-Bold": require("@/assets/fonts/Circular-Bold.ttf"),
+    "Circular-ExtraBold": require("@/assets/fonts/Circular-ExtraBold.ttf"),
   });
 
   useEffect(() => {

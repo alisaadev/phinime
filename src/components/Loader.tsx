@@ -13,7 +13,7 @@ export default function Loader({ visible }: LoaderProps) {
       <LottieView
         autoPlay
         style={{ width: 150, height: 150 }}
-        source={require("@/animations/loading.json")}
+        source={require("@/assets/animations/loading.json")}
       />
     </View>
   );

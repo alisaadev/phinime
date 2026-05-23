@@ -25,7 +25,7 @@ import {
   Bookmark,
 } from "@/services/bookmark";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const { width: SCREEN_WIDTH, height } = Dimensions.get("window");
 const PADDING = 16;
 const GAP = 6;
 const CARD_WIDTH = (SCREEN_WIDTH - PADDING * 2 - GAP * 2) / 3;
@@ -200,27 +200,27 @@ export default function BookmarkScreen() {
           <Loader visible={loading} />
         </View>
       ) : (
-      <Animated.FlatList
-        ref={scrollRef}
-        data={loading ? [] : bookmarks}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        numColumns={3}
-        columnWrapperStyle={styles.row}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        removeClippedSubviews
-        initialNumToRender={6}
-        maxToRenderPerBatch={6}
-        windowSize={5}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scroll } } }],
-          { useNativeDriver: false },
-        )}
-        scrollEventThrottle={16}
-        ListEmptyComponent={!loading ? <EmptyState /> : null}
-        ListFooterComponent={<View style={styles.padding} />}
-      />
+        <Animated.FlatList
+          ref={scrollRef}
+          data={loading ? [] : bookmarks}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
+          numColumns={3}
+          columnWrapperStyle={styles.row}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          removeClippedSubviews
+          initialNumToRender={6}
+          maxToRenderPerBatch={6}
+          windowSize={5}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scroll } } }],
+            { useNativeDriver: false },
+          )}
+          scrollEventThrottle={16}
+          ListEmptyComponent={!loading ? <EmptyState /> : null}
+          ListFooterComponent={<View style={{ marginBottom: "24%" }} />}
+        />
       )}
     </View>
   );
@@ -310,11 +310,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   emptyWrapper: {
-    flex: 1,
+    height: height / 1.45,
     justifyContent: "center",
     alignItems: "center",
     gap: 2,
-    paddingBottom: 80,
   },
   emptyTitle: {
     fontSize: 18,
@@ -327,8 +326,5 @@ const styles = StyleSheet.create({
     textAlign: "center",
     paddingHorizontal: 40,
     lineHeight: 20,
-  },
-  padding: {
-    marginBottom: "24%",
   },
 });

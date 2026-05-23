@@ -17,7 +17,7 @@ import {
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import Button from "@/components/Button";
-import { getHome, Top10Item } from "@/services/api2";
+import { getHome, Top10Item } from "@/services/samehadaku";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_WIDTH = SCREEN_WIDTH - 32;

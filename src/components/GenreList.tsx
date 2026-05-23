@@ -4,7 +4,7 @@ import { View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
 
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
-import { getGenres, Genre } from "@/services/api";
+import { getGenres, Genre } from "@/services/otakudesu";
 
 interface GenreChipProps {
   item: Genre;

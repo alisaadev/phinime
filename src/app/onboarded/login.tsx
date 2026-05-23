@@ -42,7 +42,7 @@ export default function Login() {
           onPress={handleGoogle}
         >
           <Image
-            source={require("@/images/GoogleIcon.png")}
+            source={require("@/assets/images/GoogleIcon.png")}
             style={styles.googleIcon}
             contentFit="cover"
           />

@@ -13,7 +13,7 @@ import Icon from "@/components/Icon";
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import Loader from "@/components/Loader";
-import { getHome, OngoingAnime } from "@/services/api";
+import { getHome, OngoingAnime } from "@/services/otakudesu";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_WIDTH = (SCREEN_WIDTH - 48) / 2.3;
@@ -88,7 +88,7 @@ export default function AnimeRecent() {
         <Text style={styles.sectionTitle}>Anime Update</Text>
         <TouchableOpacity
           style={styles.scheduleBtn}
-          onPress={() => router.push("/schedule")}
+          onPress={() => router.push("/screens/Schedule")}
           activeOpacity={0.8}
         >
           <Text style={styles.scheduleBtnText}>Lihat Jadwal</Text>
