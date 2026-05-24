@@ -142,7 +142,7 @@ export default function AnimeCompleted() {
         <Text style={styles.sectionTitle}>Anime Completed</Text>
         <TouchableOpacity
           style={styles.completedBtn}
-          onPress={() => router.push("/completed")}
+          onPress={() => router.push("/anime-list?type=completed")}
           activeOpacity={0.8}
         >
           <Text style={styles.completedBtnText}>Lihat semua</Text>

@@ -88,7 +88,7 @@ export default function AnimeRecent() {
         <Text style={styles.sectionTitle}>Anime Update</Text>
         <TouchableOpacity
           style={styles.scheduleBtn}
-          onPress={() => router.push("/screens/Schedule")}
+          onPress={() => router.push("/anime-list/schedule")}
           activeOpacity={0.8}
         >
           <Text style={styles.scheduleBtnText}>Lihat Jadwal</Text>

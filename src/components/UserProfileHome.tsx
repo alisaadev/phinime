@@ -33,7 +33,7 @@ export default function UserProfileHome() {
 
   const handleSignOut = async () => {
     await signOut();
-    router.replace("/onboarded/login");
+    router.replace("/login");
   };
 
   if (!user) return null;

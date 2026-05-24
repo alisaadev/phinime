@@ -6,7 +6,7 @@ import Button from "@/components/Button";
 
 type Props = {
   title: String;
-  scroll: Animated.Value;
+  scroll?: Animated.Value;
 };
 
 export default function Header({ title, scroll }: Props) {

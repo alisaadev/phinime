@@ -39,7 +39,7 @@ export default function OnboardingScreen() {
   const handlePress = async () => {
     if (currentIndex === data.length - 1 && !active) {
       await AsyncStorage.setItem("hasOnboarded", "true");
-      router.replace("/onboarded/login");
+      router.replace("/login");
       return;
     }
 

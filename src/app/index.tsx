@@ -30,9 +30,9 @@ export default function WelcomeScreen() {
       if (!hasOnboarded) {
         router.replace("/onboarding");
       } else if (!user) {
-        router.replace("/onboarded/login");
+        router.replace("/login");
       } else {
-        router.replace("/onboarded/(tabs)");
+        router.replace("/(tabs)");
       }
 
       cleanExpiredCache();

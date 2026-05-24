@@ -1,0 +1,384 @@
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { useState, useEffect, useCallback, useRef } from "react";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+  FlatList,
+  Animated,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+} from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+
+import Text from "@/components/Text";
+import colors from "@/constants/colors";
+import Loader from "@/components/Loader";
+import AnimeCard from "@/components/AnimeCard";
+import BackButton from "@/components/BackButton";
+import { getOngoingAnime, getCompleteAnime } from "@/services/otakudesu";
+import type { OngoingAnime, CompletedAnime } from "@/services/otakudesu";
+
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+
+type TabType = "ongoing" | "completed";
+
+export default function AnimeListScreen() {
+  const router = useRouter();
+  const params = useLocalSearchParams<{ type: TabType }>();
+  const [activeTab, setActiveTab] = useState<TabType>(params.type || "ongoing");
+
+  // Ongoing States
+  const [ongoingList, setOngoingList] = useState<OngoingAnime[]>([]);
+  const [ongoingLoading, setOngoingLoading] = useState(true);
+  const [ongoingPage, setOngoingPage] = useState(1);
+  const [ongoingHasMore, setOngoingHasMore] = useState(true);
+  const [ongoingRefreshing, setOngoingRefreshing] = useState(false);
+
+  // Completed States
+  const [completedList, setCompletedList] = useState<CompletedAnime[]>([]);
+  const [completedLoading, setCompletedLoading] = useState(true);
+  const [completedPage, setCompletedPage] = useState(1);
+  const [completedHasMore, setCompletedHasMore] = useState(true);
+  const [completedRefreshing, setCompletedRefreshing] = useState(false);
+
+  // Animated values
+  const scrollX = useRef(new Animated.Value(params.type === "completed" ? SCREEN_WIDTH : 0)).current;
+  const scrollViewRef = useRef<FlatList | any>(null);
+  
+  // Scaling animations for labels (like Navbar)
+  const ongoingScale = useRef(new Animated.Value(params.type === "ongoing" || !params.type ? 1.1 : 1)).current;
+  const completedScale = useRef(new Animated.Value(params.type === "completed" ? 1.1 : 1)).current;
+
+  const fetchOngoing = async (pageNum: number, isRefresh = false) => {
+    try {
+      const response = await getOngoingAnime(pageNum);
+      const newList = response.animeList;
+      if (isRefresh) setOngoingList(newList);
+      else setOngoingList((prev) => [...prev, ...newList]);
+      if (newList.length < 10) setOngoingHasMore(false);
+    } catch (error) {
+      console.error("[AnimeListScreen] Gagal fetch ongoing:", error);
+    } finally {
+      setOngoingLoading(false);
+      setOngoingRefreshing(false);
+    }
+  };
+
+  const fetchCompleted = async (pageNum: number, isRefresh = false) => {
+    try {
+      const response = await getCompleteAnime(pageNum);
+      const newList = response.animeList;
+      if (isRefresh) setCompletedList(newList);
+      else setCompletedList((prev) => [...prev, ...newList]);
+      if (newList.length < 10) setCompletedHasMore(false);
+    } catch (error) {
+      console.error("[AnimeListScreen] Gagal fetch completed:", error);
+    } finally {
+      setCompletedLoading(false);
+      setCompletedRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOngoing(1, true);
+    fetchCompleted(1, true);
+  }, []);
+
+  useEffect(() => {
+    // Spring scaling for labels (same feel as Navbar)
+    Animated.parallel([
+      Animated.spring(ongoingScale, {
+        toValue: activeTab === "ongoing" ? 1.1 : 1,
+        useNativeDriver: true,
+        friction: 7,
+        tension: 50,
+      }),
+      Animated.spring(completedScale, {
+        toValue: activeTab === "completed" ? 1.1 : 1,
+        useNativeDriver: true,
+        friction: 7,
+        tension: 50,
+      })
+    ]).start();
+  }, [activeTab]);
+
+  const handleTabChange = (tab: TabType) => {
+    if (tab === activeTab) return;
+    const toValue = tab === "ongoing" ? 0 : SCREEN_WIDTH;
+    
+    scrollViewRef.current?.scrollTo({ x: toValue, animated: true });
+    setActiveTab(tab);
+    router.setParams({ type: tab });
+  };
+
+  const onScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+    { useNativeDriver: false }
+  );
+
+  const onMomentumScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const offset = e.nativeEvent.contentOffset.x;
+    const tab = offset >= SCREEN_WIDTH / 2 ? "completed" : "ongoing";
+    if (tab !== activeTab) {
+      setActiveTab(tab);
+      router.setParams({ type: tab });
+    }
+  };
+
+  const [containerWidth, setContainerWidth] = useState(0);
+  const pillTranslateX = scrollX.interpolate({
+    inputRange: [0, SCREEN_WIDTH],
+    outputRange: [0, (containerWidth - 8) / 2], 
+    extrapolate: "clamp",
+  });
+
+  const renderOngoingItem = useCallback(
+    ({ item }: { item: OngoingAnime }) => (
+      <AnimeCard
+        title={item.title}
+        poster={item.poster}
+        eps={`${item.episodes} Eps`}
+        score={item.releaseDay}
+        subTitle={`Terakhir rilis ${item.latestReleaseDate}`}
+        onPress={() => router.push(`/detail/${item.animeId}`)}
+      />
+    ),
+    [router],
+  );
+
+  const renderCompletedItem = useCallback(
+    ({ item }: { item: CompletedAnime }) => (
+      <AnimeCard
+        title={item.title}
+        poster={item.poster}
+        eps={`${item.episodes} Eps`}
+        score={`⭐ ${item.score}`}
+        subTitle={`Terakhir rilis ${item.lastReleaseDate}`}
+        onPress={() => router.push(`/detail/${item.animeId}`)}
+      />
+    ),
+    [router],
+  );
+
+  return (
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <BackButton />
+            <View 
+              style={styles.switchContainer} 
+              onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
+            >
+              {containerWidth > 0 && (
+                <Animated.View 
+                  style={[
+                    styles.activePill, 
+                    { 
+                      width: (containerWidth - 8) / 2,
+                      transform: [{ translateX: pillTranslateX }] 
+                    }
+                  ]} 
+                />
+              )}
+              <TouchableOpacity
+                style={styles.switchButton}
+                activeOpacity={0.8}
+                onPress={() => handleTabChange("ongoing")}
+              >
+                <Animated.View style={{ transform: [{ scale: ongoingScale }] }}>
+                  <Text
+                    style={[
+                      styles.switchText,
+                      activeTab === "ongoing" && styles.activeText,
+                    ]}
+                  >
+                    Ongoing
+                  </Text>
+                </Animated.View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.switchButton}
+                activeOpacity={0.8}
+                onPress={() => handleTabChange("completed")}
+              >
+                <Animated.View style={{ transform: [{ scale: completedScale }] }}>
+                  <Text
+                    style={[
+                      styles.switchText,
+                      activeTab === "completed" && styles.activeText,
+                    ]}
+                  >
+                    Completed
+                  </Text>
+                </Animated.View>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <Animated.ScrollView
+            ref={scrollViewRef}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={onScroll}
+            onMomentumScrollEnd={onMomentumScrollEnd}
+            scrollEventThrottle={16}
+            contentOffset={{ x: params.type === "completed" ? SCREEN_WIDTH : 0, y: 0 }}
+          >
+            {/* Ongoing List */}
+            <View style={{ width: SCREEN_WIDTH }}>
+              {ongoingLoading && !ongoingRefreshing ? (
+                <View style={styles.loadingWrapper}>
+                  <Loader visible={true} />
+                </View>
+              ) : (
+                <FlatList
+                  data={ongoingList}
+                  renderItem={renderOngoingItem}
+                  keyExtractor={(item, index) => `ongoing-${item.animeId}-${index}`}
+                  numColumns={3}
+                  columnWrapperStyle={styles.columnWrapper}
+                  contentContainerStyle={styles.listContent}
+                  onRefresh={() => {
+                    setOngoingRefreshing(true);
+                    setOngoingPage(1);
+                    setOngoingHasMore(true);
+                    fetchOngoing(1, true);
+                  }}
+                  refreshing={ongoingRefreshing}
+                  onEndReached={() => {
+                    if (!ongoingLoading && ongoingHasMore) {
+                      const next = ongoingPage + 1;
+                      setOngoingPage(next);
+                      fetchOngoing(next);
+                    }
+                  }}
+                  onEndReachedThreshold={0.5}
+                  ListFooterComponent={() =>
+                    ongoingHasMore ? (
+                      <Loader visible={ongoingLoading} />
+                    ) : (
+                      <View style={{ marginBottom: "24%" }} />
+                    )
+                  }
+                />
+              )}
+            </View>
+
+            {/* Completed List */}
+            <View style={{ width: SCREEN_WIDTH }}>
+              {completedLoading && !completedRefreshing ? (
+                <View style={styles.loadingWrapper}>
+                  <Loader visible={true} />
+                </View>
+              ) : (
+                <FlatList
+                  data={completedList}
+                  renderItem={renderCompletedItem}
+                  keyExtractor={(item, index) => `completed-${item.animeId}-${index}`}
+                  numColumns={3}
+                  columnWrapperStyle={styles.columnWrapper}
+                  contentContainerStyle={styles.listContent}
+                  onRefresh={() => {
+                    setCompletedRefreshing(true);
+                    setCompletedPage(1);
+                    setCompletedHasMore(true);
+                    fetchCompleted(1, true);
+                  }}
+                  refreshing={completedRefreshing}
+                  onEndReached={() => {
+                    if (!completedLoading && completedHasMore) {
+                      const next = completedPage + 1;
+                      setCompletedPage(next);
+                      fetchCompleted(next);
+                    }
+                  }}
+                  onEndReachedThreshold={0.5}
+                  ListFooterComponent={() =>
+                    completedHasMore ? (
+                      <Loader visible={completedLoading} />
+                    ) : (
+                      <View style={{ marginBottom: "24%" }} />
+                    )
+                  }
+                />
+              )}
+            </View>
+          </Animated.ScrollView>
+        </View>
+      </SafeAreaView>
+    </SafeAreaProvider>
+  );
+}
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  container: {
+    flex: 1,
+  },
+  header: {
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  switchContainer: {
+    flex: 1,
+    flexDirection: "row",
+    backgroundColor: colors.secondary,
+    borderRadius: 99,
+    padding: 4,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.05)",
+    position: "relative",
+  },
+  activePill: {
+    position: "absolute",
+    top: 4,
+    bottom: 4,
+    left: 4,
+    backgroundColor: colors.accent,
+    borderRadius: 99,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
+  },
+  switchButton: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1,
+  },
+  switchText: {
+    color: colors.textDark,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  activeText: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+  },
+  listContent: {
+    paddingHorizontal: 16,
+  },
+  columnWrapper: {
+    justifyContent: "space-between",
+  },
+  loadingWrapper: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});

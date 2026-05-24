@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
@@ -9,14 +9,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
-  Animated,
-  ActivityIndicator,
 } from "react-native";
 
 import Icon from "@/components/Icon";
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import Loader from "@/components/Loader";
+import Button from "@/components/Button";
 import { getSchedule } from "@/services/otakudesu";
 import BackButton from "@/components/BackButton";
 
@@ -75,35 +74,18 @@ interface AnimeCardProps {
 }
 
 function DayPicker({ days, selected, onSelect }: DayPickerProps) {
-  const scrollRef = useRef<ScrollView>(null);
-
-  useEffect(() => {
-    const idx = days.indexOf(selected);
-    if (idx >= 0 && scrollRef.current) {
-      scrollRef.current.scrollTo({
-        x: idx * 72 - SCREEN_WIDTH / 2 + 36,
-        animated: true,
-      });
-    }
-  }, [selected, days]);
-
   return (
     <View style={styles.dayPicker}>
       {days.map((day) => {
         const isActive = day === selected;
         return (
-          <TouchableOpacity
+          <Button
             key={day}
+            title={DAY_SHORT[day] ?? day}
             onPress={() => onSelect(day)}
-            activeOpacity={0.8}
-            style={[styles.dayItem, isActive && styles.dayItemActive]}
-          >
-            <Text
-              style={[styles.dayNumber, isActive && styles.dayNumberActive]}
-            >
-              {DAY_SHORT[day] ?? day}
-            </Text>
-          </TouchableOpacity>
+            text={[styles.dayNumber, isActive && styles.dayNumberActive]}
+            button={[styles.dayItem, isActive && styles.dayItemActive]}
+          />
         );
       })}
     </View>

@@ -19,7 +19,7 @@ export default function Login() {
     setLoading(false);
 
     if (result.success) {
-      router.replace("/onboarded/(tabs)");
+      router.replace("/(tabs)");
       ToastAndroid.show(
         "Berhasil Login dengan Akun " + result.user.email,
         ToastAndroid.SHORT,
