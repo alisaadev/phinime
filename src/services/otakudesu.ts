@@ -52,6 +52,7 @@ export interface CompletedAnime {
   poster: string;
   episodes: number;
   score: string;
+  season: string;
   lastReleaseDate: string;
   animeId: string;
   href: string;

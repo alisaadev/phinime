@@ -17,11 +17,16 @@ export default function OngoingList({ initialList }: OngoingListProps) {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const fetchOngoing = async (pageNum: number, isRefresh = false) => {
     try {
-      setLoading(true);
+      if (pageNum > 1) {
+        setIsLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
+
       const response = await getOngoingAnime(pageNum);
       const newList = response.animeList;
       if (isRefresh) setList(newList);
@@ -31,7 +36,7 @@ export default function OngoingList({ initialList }: OngoingListProps) {
       console.error("[OngoingList] Gagal fetch:", error);
     } finally {
       setLoading(false);
-      setRefreshing(false);
+      setIsLoadingMore(false);
     }
   };
 
@@ -49,6 +54,16 @@ export default function OngoingList({ initialList }: OngoingListProps) {
     [router],
   );
 
+  const renderFooter = () => {
+    if (!isLoadingMore) return null;
+
+    return (
+      <View style={styles.footerLoader}>
+        <Loader visible={true} />
+      </View>
+    );
+  };
+
   return (
     <FlatList
       data={list}
@@ -57,28 +72,20 @@ export default function OngoingList({ initialList }: OngoingListProps) {
       numColumns={3}
       columnWrapperStyle={styles.columnWrapper}
       contentContainerStyle={styles.listContent}
-      onRefresh={() => {
-        setRefreshing(true);
-        setPage(1);
-        setHasMore(true);
-        fetchOngoing(1, true);
-      }}
-      refreshing={refreshing}
+      scrollIndicatorInsets={{ right: 1 }}
+      showsVerticalScrollIndicator={false}
       onEndReached={() => {
-        if (!loading && hasMore) {
+        if (!loading && !isLoadingMore && hasMore) {
           const next = page + 1;
           setPage(next);
           fetchOngoing(next);
         }
       }}
       onEndReachedThreshold={0.5}
-      ListFooterComponent={() =>
-        hasMore ? (
-          <Loader visible={loading} />
-        ) : (
-          <View style={{ marginBottom: "24%" }} />
-        )
-      }
+      ListFooterComponent={renderFooter}
+      initialNumToRender={4}
+      maxToRenderPerBatch={4}
+      windowSize={5}
     />
   );
 }
@@ -89,5 +96,10 @@ const styles = StyleSheet.create({
   },
   columnWrapper: {
     justifyContent: "space-between",
+  },
+  footerLoader: {
+    paddingVertical: 16,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
