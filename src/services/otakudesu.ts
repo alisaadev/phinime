@@ -221,7 +221,7 @@ export interface UnlimitedAnime {
 // ============================================================
 // HELPER — raw fetch (tanpa cache, dipakai internal saja)
 // ============================================================
-async function fetchApi<T>(path: string): Promise<ApiResponse<T>> {
+async function fetchApi<T>(path: string): Promise<T> {
   const url = `${BASE_URL}${path}`;
   const res = await fetch(url);
 
@@ -243,7 +243,7 @@ async function fetchApi<T>(path: string): Promise<ApiResponse<T>> {
 // ============================================================
 
 /** GET /anime/home — Halaman utama (ongoing + completed) */
-export async function getHome(): Promise<ApiResponse<HomeData>> {
+export async function getHome(): Promise<HomeData> {
   return cacheOrFetch("anime:home", () => fetchApi<HomeData>("/home"));
 }
 
@@ -262,9 +262,7 @@ export async function getSchedule(): Promise<{
 }
 
 /** GET /anime/genre — Daftar semua genre */
-export async function getGenres(): Promise<
-  ApiResponse<{ genreList: Genre[] }>
-> {
+export async function getGenres(): Promise<{ genreList: Genre[] }> {
   return cacheOrFetch("anime:genres", () =>
     fetchApi<{ genreList: Genre[] }>("/genre"),
   );
@@ -274,16 +272,14 @@ export async function getGenres(): Promise<
 export async function getAnimeByGenre(
   genreId: string,
   page = 1,
-): Promise<ApiResponse<{ animeList: CompletedAnime[] }>> {
+): Promise<{ animeList: CompletedAnime[] }> {
   return cacheOrFetch(`anime:genre:${genreId}:page:${page}`, () =>
     fetchApi<{ animeList: CompletedAnime[] }>(`/genre/${genreId}?page=${page}`),
   );
 }
 
 /** GET /anime/anime/:slug — Detail lengkap sebuah anime */
-export async function getAnimeDetail(
-  slug: string,
-): Promise<ApiResponse<AnimeDetail>> {
+export async function getAnimeDetail(slug: string): Promise<AnimeDetail> {
   return cacheOrFetch(`anime:detail:${slug}`, () =>
     fetchApi<AnimeDetail>(`/anime/${slug}`),
   );
@@ -292,7 +288,7 @@ export async function getAnimeDetail(
 /** GET /anime/ongoing-anime — Daftar anime ongoing */
 export async function getOngoingAnime(
   page = 1,
-): Promise<ApiResponse<{ animeList: OngoingAnime[] }>> {
+): Promise<{ animeList: OngoingAnime[] }> {
   return cacheOrFetch(`anime:ongoing:page:${page}`, () =>
     fetchApi<{ animeList: OngoingAnime[] }>(`/ongoing-anime?page=${page}`),
   );
@@ -301,23 +297,21 @@ export async function getOngoingAnime(
 /** GET /anime/complete-anime — Daftar anime tamat */
 export async function getCompleteAnime(
   page = 1,
-): Promise<ApiResponse<{ animeList: CompletedAnime[] }>> {
+): Promise<{ animeList: CompletedAnime[] }> {
   return cacheOrFetch(`anime:complete:page:${page}`, () =>
     fetchApi<{ animeList: CompletedAnime[] }>(`/complete-anime?page=${page}`),
   );
 }
 
 /** GET /anime/episode/:slug — Detail episode + link streaming & download */
-export async function getEpisode(
-  slug: string,
-): Promise<ApiResponse<EpisodeDetail>> {
+export async function getEpisode(slug: string): Promise<EpisodeDetail> {
   return cacheOrFetch(`anime:episode:${slug}`, () =>
     fetchApi<EpisodeDetail>(`/episode/${slug}`),
   );
 }
 
 /** GET /anime/batch/:slug — Link download batch anime */
-export async function getBatch(slug: string): Promise<ApiResponse<BatchData>> {
+export async function getBatch(slug: string): Promise<BatchData> {
   return cacheOrFetch(`anime:batch:${slug}`, () =>
     fetchApi<BatchData>(`/batch/${slug}`),
   );
@@ -327,30 +321,30 @@ export async function getBatch(slug: string): Promise<ApiResponse<BatchData>> {
 export async function searchAnime(
   keyword: string,
   userId?: string,
-): Promise<ApiResponse<{ animeList: SearchAnime[] }>> {
+): Promise<{ animeList: SearchAnime[] }> {
   const encoded = encodeURIComponent(keyword);
   const keywordtrim = keyword.trim().toLowerCase();
 
-  return cacheOrFetch(`anime:search:${keywordtrim}`, () => {
-    fetchApi<{ animeList: SearchAnime[] }>(`/search/${encoded}`);
+  return cacheOrFetch(`anime:search:${keywordtrim}`, async () => {
+    const result = await fetchApi<{ animeList: SearchAnime[] }>(
+      `/search/${encoded}`,
+    );
 
     if (userId && keywordtrim) {
       saveSearchHistory(userId, keywordtrim).catch(() => {});
     }
+
+    return result;
   });
 }
 
 /** GET /anime/server/:serverId — URL embed streaming berdasarkan server ID */
-export async function getServerUrl(
-  serverId: string,
-): Promise<ApiResponse<ServerData>> {
+export async function getServerUrl(serverId: string): Promise<ServerData> {
   return fetchApi<ServerData>(`/server/${serverId}`);
 }
 
 /** GET /anime/unlimited — Semua data anime */
-export async function getAllAnime(): Promise<
-  ApiResponse<{ animeList: UnlimitedAnime[] }>
-> {
+export async function getAllAnime(): Promise<{ animeList: UnlimitedAnime[] }> {
   return cacheOrFetch("anime:unlimited", () =>
     fetchApi<{ animeList: UnlimitedAnime[] }>("/unlimited"),
   );
