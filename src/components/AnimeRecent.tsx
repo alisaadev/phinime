@@ -1,6 +1,5 @@
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useEffect, useState, memo, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   View,
   StyleSheet,
@@ -13,40 +12,11 @@ import Icon from "@/components/Icon";
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import Loader from "@/components/Loader";
+import AnimeCard from "@/components/AnimeCard";
 import { getHome, OngoingAnime } from "@/services/otakudesu";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_WIDTH = (SCREEN_WIDTH - 48) / 2.3;
-const CARD_HEIGHT = CARD_WIDTH * 1.5;
-
-interface AnimeCardProps {
-  item: OngoingAnime;
-  onPress: () => void;
-}
-
-const AnimeCard = memo(({ item, onPress }: AnimeCardProps) => (
-  <TouchableOpacity style={styles.card} activeOpacity={0.8} onPress={onPress}>
-    <Image
-      source={{ uri: item.poster }}
-      style={{ width: "100%", height: "70%" }}
-      contentFit="cover"
-    />
-
-    <View style={styles.info}>
-      <Text style={styles.title} numberOfLines={2}>
-        {item.title}
-      </Text>
-      <View style={styles.meta}>
-        <View style={styles.epBadge}>
-          <Text style={styles.epText}>Ep {item.episodes}</Text>
-        </View>
-        <Text style={styles.latestReleaseDate} numberOfLines={1}>
-          {item.releaseDay}, {item.latestReleaseDate}
-        </Text>
-      </View>
-    </View>
-  </TouchableOpacity>
-));
 
 export default function AnimeRecent() {
   const router = useRouter();
@@ -59,8 +29,8 @@ export default function AnimeRecent() {
 
   async function fetchData() {
     try {
-      const home = await getHome();
-      setAnimeList(home.ongoing.animeList);
+      const res = await getHome();
+      setAnimeList(res.ongoing.animeList);
     } catch (err) {
       console.error("[AnimeRecent] Gagal fetch:", err);
     } finally {
@@ -75,7 +45,13 @@ export default function AnimeRecent() {
 
   const renderItem = useCallback(
     ({ item }: { item: OngoingAnime }) => (
-      <AnimeCard item={item} onPress={handlePress(item.animeId)} />
+      <AnimeCard
+        title={item.title}
+        poster={item.poster}
+        eps={`Ep ${item.episodes}`}
+        subTitle={`${item.releaseDay}, ${item.latestReleaseDate}`}
+        onPress={handlePress(item.animeId)}
+      />
     ),
     [handlePress],
   );
@@ -150,50 +126,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     gap: 10,
   },
-  card: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
-    borderRadius: 12,
-    overflow: "hidden",
-    backgroundColor: colors.secondary,
-  },
-  info: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 6,
-    gap: 6,
-  },
-  title: {
-    color: colors.text,
-    fontSize: 12,
-    fontWeight: "700",
-    lineHeight: 16,
-  },
-  meta: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  epBadge: {
-    backgroundColor: colors.accent,
-    borderRadius: 6,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-  },
-  epText: {
-    color: "white",
-    fontSize: 10,
-    fontWeight: "700",
-  },
-  latestReleaseDate: {
-    color: colors.textDark,
-    fontSize: 10,
-    fontWeight: "500",
-    flex: 1,
-  },
   skeletonRow: {
-    height: CARD_HEIGHT,
+    height: CARD_WIDTH,
   },
 });

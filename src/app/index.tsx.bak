@@ -33,13 +33,13 @@ export default function WelcomeScreen() {
 
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
-        if (!hasOnboarded) {
+        /*if (!hasOnboarded) {
           router.replace("/onboarding");
         } else if (!user) {
           router.replace("/login");
         } else {
           router.replace("/(tabs)");
-        }
+        }*/
 
         cleanExpiredCache();
       } catch (error) {
