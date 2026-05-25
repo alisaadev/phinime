@@ -25,7 +25,7 @@ export default function WelcomeScreen() {
         supabase.auth.getUser(),
       ]);
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       if (!hasOnboarded) {
         router.replace("/onboarding");

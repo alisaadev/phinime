@@ -1,166 +1,122 @@
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   StyleSheet,
   TouchableOpacity,
   Dimensions,
-  FlatList,
   Animated,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
+  LayoutChangeEvent,
 } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import Loader from "@/components/Loader";
-import AnimeCard from "@/components/AnimeCard";
 import BackButton from "@/components/BackButton";
+
+import OngoingList from "./ongoing";
+import CompletedList from "./completed";
+
 import { getOngoingAnime, getCompleteAnime } from "@/services/otakudesu";
 import type { OngoingAnime, CompletedAnime } from "@/services/otakudesu";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
+
+const TABS = [
+  { key: "ongoing", label: "Ongoing" },
+  { key: "completed", label: "Completed" },
+] as const;
 
 type TabType = "ongoing" | "completed";
 
 export default function AnimeListScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ type: TabType }>();
-  const [activeTab, setActiveTab] = useState<TabType>(params.type || "ongoing");
+  const initialTab: TabType =
+    params.type === "completed" ? "completed" : "ongoing";
 
-  // Ongoing States
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [ongoingList, setOngoingList] = useState<OngoingAnime[]>([]);
-  const [ongoingLoading, setOngoingLoading] = useState(true);
-  const [ongoingPage, setOngoingPage] = useState(1);
-  const [ongoingHasMore, setOngoingHasMore] = useState(true);
-  const [ongoingRefreshing, setOngoingRefreshing] = useState(false);
-
-  // Completed States
   const [completedList, setCompletedList] = useState<CompletedAnime[]>([]);
-  const [completedLoading, setCompletedLoading] = useState(true);
-  const [completedPage, setCompletedPage] = useState(1);
-  const [completedHasMore, setCompletedHasMore] = useState(true);
-  const [completedRefreshing, setCompletedRefreshing] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [tabWidth, setTabWidth] = useState(0);
 
-  // Animated values
-  const scrollX = useRef(new Animated.Value(params.type === "completed" ? SCREEN_WIDTH : 0)).current;
-  const scrollViewRef = useRef<FlatList | any>(null);
-  
-  // Scaling animations for labels (like Navbar)
-  const ongoingScale = useRef(new Animated.Value(params.type === "ongoing" || !params.type ? 1.1 : 1)).current;
-  const completedScale = useRef(new Animated.Value(params.type === "completed" ? 1.1 : 1)).current;
+  const slide = useRef(
+    new Animated.Value(initialTab === "completed" ? 1 : 0),
+  ).current;
 
-  const fetchOngoing = async (pageNum: number, isRefresh = false) => {
-    try {
-      const response = await getOngoingAnime(pageNum);
-      const newList = response.animeList;
-      if (isRefresh) setOngoingList(newList);
-      else setOngoingList((prev) => [...prev, ...newList]);
-      if (newList.length < 10) setOngoingHasMore(false);
-    } catch (error) {
-      console.error("[AnimeListScreen] Gagal fetch ongoing:", error);
-    } finally {
-      setOngoingLoading(false);
-      setOngoingRefreshing(false);
-    }
-  };
+  const scales = useRef(
+    TABS.map(
+      (_, i) =>
+        new Animated.Value(
+          (initialTab === "ongoing" && i === 0) ||
+            (initialTab === "completed" && i === 1)
+            ? 1.1
+            : 1,
+        ),
+    ),
+  ).current;
 
-  const fetchCompleted = async (pageNum: number, isRefresh = false) => {
-    try {
-      const response = await getCompleteAnime(pageNum);
-      const newList = response.animeList;
-      if (isRefresh) setCompletedList(newList);
-      else setCompletedList((prev) => [...prev, ...newList]);
-      if (newList.length < 10) setCompletedHasMore(false);
-    } catch (error) {
-      console.error("[AnimeListScreen] Gagal fetch completed:", error);
-    } finally {
-      setCompletedLoading(false);
-      setCompletedRefreshing(false);
-    }
-  };
+  const itemWidth = tabWidth / TABS.length;
 
   useEffect(() => {
-    fetchOngoing(1, true);
-    fetchCompleted(1, true);
+    const fetchAll = async () => {
+      try {
+        const [ongoing, completed] = await Promise.all([
+          getOngoingAnime(1),
+          getCompleteAnime(1),
+        ]);
+
+        setOngoingList(ongoing.animeList);
+        setCompletedList(completed.animeList);
+      } catch (error) {
+        console.error("[AnimeListScreen] Gagal fetch:", error);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+    fetchAll();
   }, []);
 
   useEffect(() => {
-    // Spring scaling for labels (same feel as Navbar)
-    Animated.parallel([
-      Animated.spring(ongoingScale, {
-        toValue: activeTab === "ongoing" ? 1.1 : 1,
+    const selectedIndex = activeTab === "ongoing" ? 0 : 1;
+
+    Animated.spring(slide, {
+      toValue: selectedIndex,
+      useNativeDriver: true,
+      friction: 10,
+      tension: 50,
+    }).start();
+
+    TABS.forEach((_, i) => {
+      Animated.spring(scales[i], {
+        toValue: i === selectedIndex ? 1.1 : 1,
         useNativeDriver: true,
-        friction: 7,
+        friction: 6,
         tension: 50,
-      }),
-      Animated.spring(completedScale, {
-        toValue: activeTab === "completed" ? 1.1 : 1,
-        useNativeDriver: true,
-        friction: 7,
-        tension: 50,
-      })
-    ]).start();
+      }).start();
+    });
   }, [activeTab]);
 
   const handleTabChange = (tab: TabType) => {
     if (tab === activeTab) return;
-    const toValue = tab === "ongoing" ? 0 : SCREEN_WIDTH;
-    
-    scrollViewRef.current?.scrollTo({ x: toValue, animated: true });
     setActiveTab(tab);
     router.setParams({ type: tab });
   };
 
-  const onScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-    { useNativeDriver: false }
-  );
-
-  const onMomentumScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const offset = e.nativeEvent.contentOffset.x;
-    const tab = offset >= SCREEN_WIDTH / 2 ? "completed" : "ongoing";
-    if (tab !== activeTab) {
-      setActiveTab(tab);
-      router.setParams({ type: tab });
-    }
+  const onLayout = (e: LayoutChangeEvent) => {
+    setTabWidth(e.nativeEvent.layout.width);
   };
 
-  const [containerWidth, setContainerWidth] = useState(0);
-  const pillTranslateX = scrollX.interpolate({
-    inputRange: [0, SCREEN_WIDTH],
-    outputRange: [0, (containerWidth - 8) / 2.03], 
-    extrapolate: "clamp",
-  });
-
-  const renderOngoingItem = useCallback(
-    ({ item }: { item: OngoingAnime }) => (
-      <AnimeCard
-        title={item.title}
-        poster={item.poster}
-        eps={`${item.episodes} Eps`}
-        score={item.releaseDay}
-        subTitle={`Terakhir rilis ${item.latestReleaseDate}`}
-        onPress={() => router.push(`/detail/${item.animeId}`)}
-      />
-    ),
-    [router],
-  );
-
-  const renderCompletedItem = useCallback(
-    ({ item }: { item: CompletedAnime }) => (
-      <AnimeCard
-        title={item.title}
-        poster={item.poster}
-        eps={`${item.episodes} Eps`}
-        score={`⭐ ${item.score}`}
-        subTitle={`Terakhir rilis ${item.lastReleaseDate}`}
-        onPress={() => router.push(`/detail/${item.animeId}`)}
-      />
-    ),
-    [router],
-  );
+  const bubbleTranslateX =
+    itemWidth > 0
+      ? slide.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, itemWidth],
+          extrapolate: "clamp",
+        })
+      : new Animated.Value(0);
 
   return (
     <SafeAreaProvider>
@@ -168,146 +124,69 @@ export default function AnimeListScreen() {
         <View style={styles.container}>
           <View style={styles.header}>
             <BackButton />
-            <View 
-              style={styles.switchContainer} 
-              onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
-            >
-              {containerWidth > 0 && (
-                <Animated.View 
+
+            <View style={styles.switchContainer} onLayout={onLayout}>
+              {tabWidth > 0 && (
+                <Animated.View
                   style={[
-                    styles.activePill, 
-                    { 
-                      width: (containerWidth - 8) / 2,
-                      transform: [{ translateX: pillTranslateX }] 
-                    }
-                  ]} 
+                    styles.activeBubble,
+                    {
+                      width: itemWidth - 7.2,
+                      transform: [{ translateX: bubbleTranslateX }],
+                    },
+                  ]}
                 />
               )}
-              <TouchableOpacity
-                style={styles.switchButton}
-                activeOpacity={0.8}
-                onPress={() => handleTabChange("ongoing")}
-              >
-                <Animated.View style={{ transform: [{ scale: ongoingScale }] }}>
-                  <Text
-                    style={[
-                      styles.switchText,
-                      activeTab === "ongoing" && styles.activeText,
-                    ]}
+
+              {TABS.map((tab, index) => (
+                <TouchableOpacity
+                  key={tab.key}
+                  style={styles.switchButton}
+                  activeOpacity={0.8}
+                  onPress={() => handleTabChange(tab.key)}
+                >
+                  <Animated.View
+                    style={{ transform: [{ scale: scales[index] }] }}
                   >
-                    Ongoing
-                  </Text>
-                </Animated.View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.switchButton}
-                activeOpacity={0.8}
-                onPress={() => handleTabChange("completed")}
-              >
-                <Animated.View style={{ transform: [{ scale: completedScale }] }}>
-                  <Text
-                    style={[
-                      styles.switchText,
-                      activeTab === "completed" && styles.activeText,
-                    ]}
-                  >
-                    Completed
-                  </Text>
-                </Animated.View>
-              </TouchableOpacity>
+                    <Text
+                      style={[
+                        styles.switchText,
+                        activeTab === tab.key && styles.activeText,
+                      ]}
+                    >
+                      {tab.label}
+                    </Text>
+                  </Animated.View>
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
 
-          <Animated.ScrollView
-            ref={scrollViewRef}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            onScroll={onScroll}
-            onMomentumScrollEnd={onMomentumScrollEnd}
-            scrollEventThrottle={16}
-            contentOffset={{ x: params.type === "completed" ? SCREEN_WIDTH : 0, y: 0 }}
-          >
-            {/* Ongoing List */}
-            <View style={{ width: SCREEN_WIDTH }}>
-              {ongoingLoading && !ongoingRefreshing ? (
-                <View style={styles.loadingWrapper}>
-                  <Loader visible={true} />
-                </View>
-              ) : (
-                <FlatList
-                  data={ongoingList}
-                  renderItem={renderOngoingItem}
-                  keyExtractor={(item, index) => `ongoing-${item.animeId}-${index}`}
-                  numColumns={3}
-                  columnWrapperStyle={styles.columnWrapper}
-                  contentContainerStyle={styles.listContent}
-                  onRefresh={() => {
-                    setOngoingRefreshing(true);
-                    setOngoingPage(1);
-                    setOngoingHasMore(true);
-                    fetchOngoing(1, true);
-                  }}
-                  refreshing={ongoingRefreshing}
-                  onEndReached={() => {
-                    if (!ongoingLoading && ongoingHasMore) {
-                      const next = ongoingPage + 1;
-                      setOngoingPage(next);
-                      fetchOngoing(next);
-                    }
-                  }}
-                  onEndReachedThreshold={0.5}
-                  ListFooterComponent={() =>
-                    ongoingHasMore ? (
-                      <Loader visible={ongoingLoading} />
-                    ) : (
-                      <View style={{ marginBottom: "24%" }} />
-                    )
-                  }
-                />
-              )}
+          {initialLoading ? (
+            <View style={styles.loadingWrapper}>
+              <Loader visible={true} />
             </View>
+          ) : (
+            <View style={styles.content}>
+              <View
+                style={[
+                  styles.page,
+                  { display: activeTab === "ongoing" ? "flex" : "none" },
+                ]}
+              >
+                <OngoingList initialList={ongoingList} />
+              </View>
 
-            {/* Completed List */}
-            <View style={{ width: SCREEN_WIDTH }}>
-              {completedLoading && !completedRefreshing ? (
-                <View style={styles.loadingWrapper}>
-                  <Loader visible={true} />
-                </View>
-              ) : (
-                <FlatList
-                  data={completedList}
-                  renderItem={renderCompletedItem}
-                  keyExtractor={(item, index) => `completed-${item.animeId}-${index}`}
-                  numColumns={3}
-                  columnWrapperStyle={styles.columnWrapper}
-                  contentContainerStyle={styles.listContent}
-                  onRefresh={() => {
-                    setCompletedRefreshing(true);
-                    setCompletedPage(1);
-                    setCompletedHasMore(true);
-                    fetchCompleted(1, true);
-                  }}
-                  refreshing={completedRefreshing}
-                  onEndReached={() => {
-                    if (!completedLoading && completedHasMore) {
-                      const next = completedPage + 1;
-                      setCompletedPage(next);
-                      fetchCompleted(next);
-                    }
-                  }}
-                  onEndReachedThreshold={0.5}
-                  ListFooterComponent={() =>
-                    completedHasMore ? (
-                      <Loader visible={completedLoading} />
-                    ) : (
-                      <View style={{ marginBottom: "24%" }} />
-                    )
-                  }
-                />
-              )}
+              <View
+                style={[
+                  styles.page,
+                  { display: activeTab === "completed" ? "flex" : "none" },
+                ]}
+              >
+                <CompletedList initialList={completedList} />
+              </View>
             </View>
-          </Animated.ScrollView>
+          )}
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
@@ -331,38 +210,32 @@ const styles = StyleSheet.create({
   },
   switchContainer: {
     flex: 1,
+    height: 45,
+    borderRadius: 40,
+    borderWidth: 0.8,
+    borderColor: "rgba(255,255,255,0.2)",
     flexDirection: "row",
+    alignItems: "center",
     backgroundColor: colors.secondary,
-    borderRadius: 99,
-    padding: 4,
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.05)",
-    position: "relative",
   },
-  activePill: {
+  activeBubble: {
     position: "absolute",
-    top: 4,
-    bottom: 4,
-    left: 4,
+    height: 39,
+    left: 2.5,
+    borderRadius: 36,
     backgroundColor: colors.accent,
-    borderRadius: 99,
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.1)",
-    shadowColor: "#000",
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 6,
+    borderColor: "rgba(255,255,255,0.1)",
   },
   switchButton: {
     flex: 1,
-    paddingVertical: 8,
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 1,
+    zIndex: 2,
+    height: "100%",
   },
   switchText: {
-    color: colors.textDark,
+    color: colors.textSecondary,
     fontSize: 14,
     fontWeight: "600",
   },
@@ -370,11 +243,11 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "700",
   },
-  listContent: {
-    paddingHorizontal: 16,
+  content: {
+    flex: 1,
   },
-  columnWrapper: {
-    justifyContent: "space-between",
+  page: {
+    flex: 1,
   },
   loadingWrapper: {
     flex: 1,
