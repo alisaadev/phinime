@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import LottieView from "lottie-react-native";
 import { StatusBar } from "expo-status-bar";
 import { View, StyleSheet } from "react-native";

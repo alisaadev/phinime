@@ -1,10 +1,8 @@
-// ============================================================
 // services/bookmark.ts — Bookmark Service
-// ============================================================
 
 import { supabase } from "@/lib/supabase";
 
-// ─── Types ───────────────────────────────────────────────────
+// TYPES
 export interface Bookmark {
   id: string;
   user_id: string;
@@ -25,11 +23,10 @@ export interface SaveBookmarkParams {
   score?: string;
 }
 
-// ─── Functions ───────────────────────────────────────────────
 
 /**
  * Tambah anime ke bookmark.
- * Kalau sudah ada → tidak duplikat (upsert).
+ * Kalau sudah ada > tidak duplikat (upsert).
  */
 export async function addBookmark(params: SaveBookmarkParams): Promise<void> {
   const { error } = await supabase.from("bookmarks").upsert(

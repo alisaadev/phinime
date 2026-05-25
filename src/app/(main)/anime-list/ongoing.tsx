@@ -1,11 +1,10 @@
+import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { View, FlatList, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
 
-import AnimeCard from "@/components/AnimeCard";
 import Loader from "@/components/Loader";
-import { getOngoingAnime } from "@/services/otakudesu";
-import type { OngoingAnime } from "@/services/otakudesu";
+import AnimeCard from "@/components/AnimeCard";
+import { getOngoingAnime, type OngoingAnime } from "@/services/otakudesu";
 
 interface OngoingListProps {
   initialList: OngoingAnime[];

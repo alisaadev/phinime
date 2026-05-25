@@ -1,11 +1,10 @@
-// ============================================================
 // services/api.ts — API Service + Cache Terintegrasi
-// ============================================================
 
 import { cacheOrFetch, saveSearchHistory } from "@/services/cache";
 
 const BASE_URL = "https://www.sankavollerei.com/anime/samehadaku";
 
+// TYPES
 export type ApiResponse<T> = {
   status: "success" | "error";
   creator: string;
@@ -193,10 +192,6 @@ export type AnimeListGroup = {
   }[];
 };
 
-// ============================================================
-// HELPER — Raw fetch ke API
-// ============================================================
-
 async function fetchApi<T>(endpoint: string): Promise<T> {
   const url = `${BASE_URL}${endpoint}`;
   const response = await fetch(url);
@@ -213,10 +208,6 @@ async function fetchApi<T>(endpoint: string): Promise<T> {
 
   return json.data;
 }
-
-// ============================================================
-// ENDPOINTS — Semua pakai cache kecuali server URL
-// ============================================================
 
 /**
  * Home — refresh tiap 10 menit (global cache)

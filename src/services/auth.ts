@@ -1,19 +1,12 @@
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { supabase } from "@/lib/supabase";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
-// ============================================================
 // KONFIGURASI — isi dengan Web Client ID dari Google Console
-// ============================================================
-
 GoogleSignin.configure({
   webClientId:
     "460160956613-v4pkpf70ulsipri4ntjqpl1ad7homcat.apps.googleusercontent.com",
   scopes: ["profile", "email"],
 });
-
-// ============================================================
-// TYPES
-// ============================================================
 
 export type AuthResult = {
   success: boolean;
@@ -26,10 +19,7 @@ export type AuthResult = {
   error?: string;
 };
 
-// ============================================================
 // GOOGLE SIGN IN
-// ============================================================
-
 export async function signInWithGoogle(): Promise<AuthResult> {
   try {
     await GoogleSignin.hasPlayServices();
@@ -79,29 +69,21 @@ export async function signInWithGoogle(): Promise<AuthResult> {
   }
 }
 
-// ============================================================
 // SIGN OUT
-// ============================================================
-
 export async function signOut(): Promise<void> {
   try {
-    // Sign out dari Google jika sedang login
     const isSignedIn = await GoogleSignin.isSignedIn();
     if (isSignedIn) {
       await GoogleSignin.signOut();
     }
   } catch (_) {
-    // Abaikan error Google sign out
+    // Ignore Google sign out error
   }
 
-  // Sign out dari Supabase
   await supabase.auth.signOut();
 }
 
-// ============================================================
 // GET CURRENT USER
-// ============================================================
-
 export async function getCurrentUser() {
   const {
     data: { user },
@@ -118,10 +100,7 @@ export async function getCurrentUser() {
   };
 }
 
-// ============================================================
 // LISTEN AUTH STATE CHANGE
-// ============================================================
-
 export function listenAuthChange(callback: (user: any | null) => void) {
   return supabase.auth.onAuthStateChange((_event, session) => {
     callback(session?.user ?? null);

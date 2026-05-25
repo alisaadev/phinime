@@ -1,11 +1,10 @@
+import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { View, FlatList, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
 
-import AnimeCard from "@/components/AnimeCard";
 import Loader from "@/components/Loader";
-import { getCompleteAnime } from "@/services/otakudesu";
-import type { CompletedAnime } from "@/services/otakudesu";
+import AnimeCard from "@/components/AnimeCard";
+import { getCompleteAnime, type CompletedAnime } from "@/services/otakudesu";
 
 interface CompletedListProps {
   initialList: CompletedAnime[];

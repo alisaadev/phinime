@@ -1,8 +1,6 @@
-// ============================================================
 // Anime API Client - sankavollerei.com
 // Base URL: https://www.sankavollerei.com/anime
 // Integrated with Cache (cache.ts)
-// ============================================================
 
 import { cacheOrFetch, saveSearchHistory } from "@/services/cache";
 
@@ -218,9 +216,6 @@ export interface UnlimitedAnime {
   otakudesuUrl: string;
 }
 
-// ============================================================
-// HELPER — raw fetch (tanpa cache, dipakai internal saja)
-// ============================================================
 async function fetchApi<T>(path: string): Promise<T> {
   const url = `${BASE_URL}${path}`;
   const res = await fetch(url);
@@ -237,10 +232,6 @@ async function fetchApi<T>(path: string): Promise<T> {
 
   return json.data;
 }
-
-// ============================================================
-// ENDPOINTS — semua dibungkus cacheOrFetch
-// ============================================================
 
 /** GET /anime/home — Halaman utama (ongoing + completed) */
 export async function getHome(): Promise<HomeData> {

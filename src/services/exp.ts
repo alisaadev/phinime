@@ -1,17 +1,14 @@
-// ============================================================
 // services/exp.ts — EXP & Level System
-// ============================================================
 
 import { supabase } from "@/lib/supabase";
 
-// ─── Constants ───────────────────────────────────────────────
+// CONSTANTS
 export const MAX_LEVEL = 93;
 export const EXP_PER_EPISODE_PAIR = 1;
 export const EXP_TO_LEVEL_LOW = 10;
 export const EXP_TO_LEVEL_HIGH = 20;
 export const LEVEL_PER_RANK = 20;
 
-// ─── Rank Data ───────────────────────────────────────────────
 export interface RankData {
   id: number;
   name: string;
@@ -64,7 +61,7 @@ export const RANKS: RankData[] = [
   },
 ];
 
-// ─── Types ───────────────────────────────────────────────────
+// TYPES
 export interface UserExp {
   id: string;
   user_id: string;
@@ -83,8 +80,6 @@ export interface LevelUpResult {
   prevLevel: number;
   prevRank: number;
 }
-
-// ─── Calculators ─────────────────────────────────────────────
 
 /**
  * EXP yang dibutuhkan untuk naik dari level ini ke level berikutnya.
@@ -143,8 +138,6 @@ export function getLevelProgress(level: number, exp: number): number {
   const needed = expRequiredForLevel(level);
   return Math.min(100, Math.round((exp / needed) * 100));
 }
-
-// ─── Supabase Functions ───────────────────────────────────────
 
 /**
  * Ambil data EXP user. Kalau belum ada, buat baru (level 1).

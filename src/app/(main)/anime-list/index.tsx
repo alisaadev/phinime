@@ -18,8 +18,7 @@ import BackButton from "@/components/BackButton";
 import OngoingList from "./ongoing";
 import CompletedList from "./completed";
 
-import { getOngoingAnime, getCompleteAnime } from "@/services/otakudesu";
-import type { OngoingAnime, CompletedAnime } from "@/services/otakudesu";
+import { getOngoingAnime, getCompleteAnime, type OngoingAnime, type CompletedAnime } from "@/services/otakudesu";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 

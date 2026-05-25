@@ -1,14 +1,8 @@
-// ============================================================
 // services/cache.ts — Cache Logic (Global + User History)
-// ============================================================
 
 import { supabase } from "@/lib/supabase";
 
 const CACHE_DURATION_MS = 10 * 60 * 1000; // 10 menit
-
-// ============================================================
-// GLOBAL CACHE
-// ============================================================
 
 /**
  * Ambil data dari cache global.
@@ -75,13 +69,9 @@ export async function cleanExpiredCache(): Promise<void> {
   }
 }
 
-// ============================================================
-// CACHE-OR-FETCH — Helper utama
-// ============================================================
-
 /**
- * Cek cache dulu. Kalau ada → return cache.
- * Kalau tidak ada / expired → fetch dari API → simpan ke cache → return.
+ * Cek cache dulu. Kalau ada > return cache.
+ * Kalau tidak ada / expired > fetch dari API > simpan ke cache > return.
  */
 export async function cacheOrFetch<T>(
   cacheKey: string,
@@ -103,10 +93,6 @@ export async function cacheOrFetch<T>(
 
   return freshData;
 }
-
-// ============================================================
-// USER SEARCH HISTORY
-// ============================================================
 
 /**
  * Simpan query pencarian ke history user.

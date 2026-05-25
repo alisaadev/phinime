@@ -1,10 +1,8 @@
-// ============================================================
 // services/history.ts — Watch History Service
-// ============================================================
 
 import { supabase } from "@/lib/supabase";
 
-// ─── Types ───────────────────────────────────────────────────
+// TYPES
 export interface WatchHistory {
   id: string;
   user_id: string;
@@ -28,8 +26,6 @@ export interface SaveWatchHistoryParams {
   progress_ms: number;
   duration_ms: number;
 }
-
-// ─── Helpers ─────────────────────────────────────────────────
 
 /** Persentase progress (0–100) */
 export function getProgressPercent(history: WatchHistory): number {
@@ -57,8 +53,6 @@ export function formatProgress(history: WatchHistory): string {
   };
   return `${fmt(history.progress_ms)} / ${fmt(history.duration_ms)}`;
 }
-
-// ─── Functions ───────────────────────────────────────────────
 
 /**
  * Simpan atau update progress menonton.
