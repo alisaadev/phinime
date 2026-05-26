@@ -243,23 +243,17 @@ export async function getHome(): Promise<
 }
 
 /** GET /anime/schedule — Jadwal rilis anime per hari */
-export async function getSchedule(): Promise<{
-  status: string;
-  creator: string;
-  data: ScheduleDay[];
-  pagination: Pagination | null;
-}> {
+export async function getSchedule(): Promise<ScheduleDay[]> {
   return cacheOrFetch("anime:schedule", async () => {
     const url = `${BASE_URL}/schedule`;
     const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP Error ${res.status}: ${res.statusText}`);
+
+    if (!res.ok) {
+      throw new Error(`HTTP Error ${res.status}: ${res.statusText}`);
+    }
+
     const json = await res.json();
-    return {
-      status: json.status,
-      creator: json.creator,
-      data: json.data.data,
-      pagination: json.pagination,
-    };
+    return json.data;
   });
 }
 

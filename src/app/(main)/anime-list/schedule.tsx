@@ -135,7 +135,7 @@ export default function ScheduleScreen() {
   async function load() {
     try {
       const res = await getSchedule();
-      const sorted = [...res.data].sort(
+      const sorted = [...res].sort(
         (a, b) => DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day),
       );
 
