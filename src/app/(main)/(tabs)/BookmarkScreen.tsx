@@ -1,6 +1,4 @@
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRef, useEffect, useState, useCallback, memo } from "react";
 import {
   View,
@@ -12,6 +10,7 @@ import {
   Animated,
 } from "react-native";
 
+import AnimeCard from "@/components/AnimeCard";
 import Icon from "@/components/Icon";
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
@@ -50,52 +49,21 @@ function EmptyState() {
   );
 }
 
-const BookmarkCard = memo(({ item, onPress, onLongPress }: CardProps) => {
-  const statusColor =
-    item.status?.toLowerCase().includes("ongoing") ||
-    item.status?.toLowerCase().includes("airing")
-      ? "#A78BFA"
-      : "#6EE7B7";
-
-  return (
-    <TouchableOpacity
-      style={styles.card}
-      activeOpacity={0.8}
-      onPress={() => onPress(item)}
-      onLongPress={() => onLongPress(item)}
-    >
-      <Image
-        source={{ uri: item.poster ?? undefined }}
-        style={StyleSheet.absoluteFillObject}
-        contentFit="cover"
-      />
-
-      <LinearGradient
-        colors={["transparent", colors.secondary]}
-        style={styles.overlay}
-      />
-
-      <View style={styles.cardInfo}>
-        <Text style={styles.cardTitle} numberOfLines={2}>
-          {item.anime_title}
-        </Text>
-        {!!item.score && (
-          <View style={styles.score}>
-            <View style={styles.scoreRow}>
-              <Icon name="Star" size={10} color="#f5c518" />
-              <Text style={styles.scoreText}>{item.score}</Text>
-            </View>
-            {!!item.status && (
-              <Text style={[styles.statusText, { color: statusColor }]}>
-                {item.status}
-              </Text>
-            )}
-          </View>
-        )}
-      </View>
-    </TouchableOpacity>
-  );
-});
+const BookmarkCard = memo(({ item, onPress, onLongPress }: CardProps) => (
+  <AnimeCard
+    title={item.anime_title}
+    poster={item.poster ?? ""}
+    score={item.score ? `${item.score}` : undefined}
+    eps={item.status ?? undefined}
+    subTitle={
+      item.added_at
+        ? new Date(item.added_at).toLocaleDateString("id-ID")
+        : undefined
+    }
+    onPress={() => onPress(item)}
+    onLongPress={() => onLongPress(item)}
+  />
+));
 
 export default function BookmarkScreen() {
   const router = useRouter();
@@ -124,7 +92,7 @@ export default function BookmarkScreen() {
 
   const handlePress = useCallback(
     (item: Bookmark) => {
-      router.push(`/detail/${item.anime_id}`);
+      router.push(`/detail/${item.anime_id}` as any);
     },
     [router],
   );

@@ -25,7 +25,10 @@ export default function Login() {
         ToastAndroid.SHORT,
       );
     } else {
-      ToastAndroid.show(typeof result.error === "string" ? result.error : "An error occurred", ToastAndroid.SHORT);
+      ToastAndroid.show(
+        typeof result.error === "string" ? result.error : "An error occurred",
+        ToastAndroid.SHORT,
+      );
       console.error(result.error);
     }
   };
@@ -56,7 +59,11 @@ export default function Login() {
           <Text style={styles.privacyLink}>Privacy Policy</Text>
         </Pressable>
 
-        <Loader visible={loading} />
+        {loading && (
+          <View style={styles.loadingWrapper}>
+            <Loader visible={loading} />
+          </View>
+        )}
       </View>
     </View>
   );
@@ -124,5 +131,16 @@ const styles = StyleSheet.create({
     color: colors.accent,
     fontSize: 13,
     fontWeight: "600",
+  },
+  loadingWrapper: {
+    flex: 1,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
   },
 });

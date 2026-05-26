@@ -171,7 +171,7 @@ export default function AnimeTop() {
   }, [isAutoPlay, animeList]);
 
   const handlePress = useCallback(
-    (animeId: string) => () => router.push(`/detail/${animeId}`),
+    (animeId: string) => () => router.push(`/detail/${animeId}` as any),
     [router],
   );
 

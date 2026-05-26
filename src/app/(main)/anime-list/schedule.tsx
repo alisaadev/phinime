@@ -152,7 +152,7 @@ export default function ScheduleScreen() {
 
   const handlePress = useCallback(
     (slug: string) => {
-      router.push(`/detail/${slug}`);
+      router.push(`/detail/${slug}` as any);
     },
     [router],
   );

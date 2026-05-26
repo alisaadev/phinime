@@ -93,7 +93,7 @@ export default function GenreDetailScreen() {
         eps={item.episodes ? `${item.episodes} Eps` : undefined}
         score={item.score ? `⭐ ${item.score}` : undefined}
         subTitle={item.season}
-        onPress={() => router.push(`/detail/${item.animeId}`)}
+        onPress={() => router.push(`/detail/${item.animeId}` as any)}
       />
     ),
     [router],

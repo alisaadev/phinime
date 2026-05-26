@@ -132,7 +132,7 @@ export default function AnimeCompleted() {
   }
 
   const handlePress = useCallback(
-    (id: string) => () => router.push(`/detail/${id}`),
+    (id: string) => () => router.push(`/detail/${id}` as any),
     [router],
   );
 

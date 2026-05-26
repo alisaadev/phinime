@@ -1,12 +1,9 @@
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRef, useEffect, useState, useCallback, memo } from "react";
 import {
   View,
   StyleSheet,
   SectionList,
-  TouchableOpacity,
   Dimensions,
   Animated,
 } from "react-native";
@@ -17,6 +14,7 @@ import colors from "@/constants/colors";
 import { supabase } from "@/lib/supabase";
 import Loader from "@/components/Loader";
 import Header from "@/components/Header";
+import AnimeCard from "@/components/AnimeCard";
 import {
   getWatchHistory,
   getProgressPercent,
@@ -109,43 +107,28 @@ function EmptyState() {
 const HistoryCard = memo(({ item, onPress }: CardProps) => {
   const percent = getProgressPercent(item);
   const watched = isWatched(item);
+  const watchedAt = new Date(item.watched_at).toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
   return (
-    <TouchableOpacity
-      style={styles.card}
-      activeOpacity={0.8}
-      onPress={() => onPress(item)}
-    >
-      <Image
-        source={{ uri: item.poster ?? undefined }}
-        style={StyleSheet.absoluteFillObject}
-        contentFit="cover"
+    <View style={styles.cardWrapper}>
+      <AnimeCard
+        title={item.anime_title}
+        poster={item.poster ?? ""}
+        score={`${percent}%`}
+        eps={item.ep_title}
+        subTitle={watched ? `Selesai • ${watchedAt}` : watchedAt}
+        onPress={() => onPress(item)}
       />
-
-      <LinearGradient
-        colors={["transparent", colors.secondary]}
-        style={styles.overlay}
-      />
-
       {watched && (
         <View style={styles.watchedBadge}>
           <Icon name="Check" size={12} color="#fff" />
         </View>
       )}
-
-      <View style={styles.cardInfo}>
-        <Text style={styles.cardTitle} numberOfLines={2}>
-          {item.anime_title}
-        </Text>
-        <Text style={styles.cardEp} numberOfLines={1}>
-          {item.ep_title}
-        </Text>
-      </View>
-
-      <View style={styles.progressTrack}>
-        <View style={[styles.progressFill, { width: `${percent}%` }]} />
-      </View>
-    </TouchableOpacity>
+    </View>
   );
 });
 
@@ -192,8 +175,7 @@ export default function HistoryScreen() {
 
   const handlePress = useCallback(
     (item: WatchHistory) => {
-      // Nanti disesuaikan ke halaman watch
-      router.push(`/watch/${item.episode_id}`);
+      router.push(`/watch/${item.anime_id}` as any);
     },
     [router],
   );
@@ -278,6 +260,10 @@ const styles = StyleSheet.create({
     gap: GAP,
     marginBottom: 16,
   },
+  cardWrapper: {
+    width: CARD_WIDTH,
+    position: "relative",
+  },
   card: {
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
@@ -288,13 +274,6 @@ const styles = StyleSheet.create({
   cardPlaceholder: {
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
-  },
-  overlay: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: "60%",
   },
   watchedBadge: {
     position: "absolute",
@@ -308,28 +287,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     zIndex: 2,
   },
-  cardInfo: {
-    position: "absolute",
-    bottom: 8,
-    left: 6,
-    right: 6,
-  },
-  cardTitle: {
-    fontSize: 9,
-    fontWeight: "700",
-    color: colors.text,
-    lineHeight: 13,
-  },
-  cardEp: {
-    fontSize: 8,
-    color: colors.textDark,
-    marginTop: 2,
-  },
   progressTrack: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
     height: 3,
     backgroundColor: "rgba(255,255,255,0.15)",
   },

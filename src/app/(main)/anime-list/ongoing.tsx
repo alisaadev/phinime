@@ -47,7 +47,7 @@ export default function OngoingList({ initialList }: OngoingListProps) {
         eps={`${item.episodes} Eps`}
         score={item.releaseDay}
         subTitle={`Terakhir rilis ${item.latestReleaseDate}`}
-        onPress={() => router.push(`/detail/${item.animeId}`)}
+        onPress={() => router.push(`/detail/${item.animeId}` as any)}
       />
     ),
     [router],

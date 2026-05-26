@@ -39,7 +39,7 @@ export default function AnimeRecent() {
   }
 
   const handlePress = useCallback(
-    (animeId: string) => () => router.push(`/detail/${animeId}`),
+    (animeId: string) => () => router.push(`/detail/${animeId}` as any),
     [router],
   );
 

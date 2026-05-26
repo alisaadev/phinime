@@ -47,7 +47,7 @@ export default function CompletedList({ initialList }: CompletedListProps) {
         eps={`${item.episodes} Eps`}
         score={`⭐ ${item.score}`}
         subTitle={`Terakhir rilis ${item.lastReleaseDate}`}
-        onPress={() => router.push(`/detail/${item.animeId}`)}
+        onPress={() => router.push(`/detail/${item.animeId}` as any)}
       />
     ),
     [router],

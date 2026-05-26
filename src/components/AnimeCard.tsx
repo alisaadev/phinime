@@ -18,6 +18,7 @@ interface AnimeCardProps {
   score?: string;
   subTitle?: string;
   onPress: () => void;
+  onLongPress?: () => void;
 }
 
 const AnimeCard = ({
@@ -27,12 +28,14 @@ const AnimeCard = ({
   score,
   subTitle,
   onPress,
+  onLongPress,
 }: AnimeCardProps) => {
   return (
     <TouchableOpacity
       style={styles.container}
       activeOpacity={0.8}
       onPress={onPress}
+      onLongPress={onLongPress}
     >
       <Image
         source={{ uri: poster }}
