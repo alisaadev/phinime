@@ -1,15 +1,8 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useState, useCallback } from "react";
+import { View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import {
-  View,
-  StyleSheet,
-  FlatList,
-  ScrollView,
-  TouchableOpacity,
-  Dimensions,
-} from "react-native";
 
 import Icon from "@/components/Icon";
 import Text from "@/components/Text";
@@ -19,7 +12,6 @@ import Button from "@/components/Button";
 import { getSchedule } from "@/services/otakudesu";
 import BackButton from "@/components/BackButton";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const DAY_ORDER = [
   "Senin",
   "Selasa",

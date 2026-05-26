@@ -40,6 +40,11 @@ interface RowProps {
   onPress: (item: WatchHistory) => void;
 }
 
+interface HistorySection {
+  title: string;
+  data: WatchHistory[][];
+}
+
 function isSameDay(a: Date, b: Date): boolean {
   return (
     a.getFullYear() === b.getFullYear() &&
@@ -56,9 +61,7 @@ function chunkArray<T>(arr: T[], size: number): T[][] {
   return result;
 }
 
-function groupByDay(
-  list: WatchHistory[],
-): { title: string; data: WatchHistory[][] }[] {
+function groupByDay(list: WatchHistory[]): HistorySection[] {
   const map = new Map<string, WatchHistory[]>();
   const today = new Date();
   const yesterday = new Date();
@@ -162,7 +165,7 @@ const HistoryRow = memo(({ items, onPress }: RowProps) => (
 export default function HistoryScreen() {
   const router = useRouter();
   const scroll = useRef(new Animated.Value(0)).current;
-  const scrollRef = useRef<SectionList>(null);
+  const scrollRef = useRef<SectionList<WatchHistory[], HistorySection>>(null);
   const [sections, setSections] = useState<
     { title: string; data: WatchHistory[][] }[]
   >([]);

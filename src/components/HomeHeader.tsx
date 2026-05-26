@@ -89,7 +89,7 @@ export default function HomeHeader({ scrollY }: Props) {
         ToastAndroid.SHORT,
       );
     } else {
-      router.push(`search/${query.trim()}`);
+      router.push(`/search/${query.trim()}`);
     }
   };
 

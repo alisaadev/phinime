@@ -9,7 +9,6 @@ import {
   PanGestureHandlerGestureEvent,
 } from "react-native-gesture-handler";
 
-import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import Navbar from "@/components/Navbar";
 

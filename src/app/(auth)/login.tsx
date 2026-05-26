@@ -19,13 +19,13 @@ export default function Login() {
     setLoading(false);
 
     if (result.success) {
-      router.replace("/(tabs)");
+      router.replace("/(main)/(tabs)");
       ToastAndroid.show(
-        "Berhasil Login dengan Akun " + result.user.email,
+        "Berhasil Login dengan Akun " + result.user?.email,
         ToastAndroid.SHORT,
       );
     } else {
-      ToastAndroid.show(result.error, ToastAndroid.SHORT);
+      ToastAndroid.show(typeof result.error === "string" ? result.error : "An error occurred", ToastAndroid.SHORT);
       console.error(result.error);
     }
   };

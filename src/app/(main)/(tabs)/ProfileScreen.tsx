@@ -1,4 +1,3 @@
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { useRef, useEffect, useState, useCallback } from "react";
@@ -7,9 +6,9 @@ import {
   StyleSheet,
   Animated,
   TouchableOpacity,
-  Dimensions,
   Alert,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 
 import Icon from "@/components/Icon";
@@ -23,8 +22,6 @@ import { getBookmarks } from "@/services/bookmark";
 import { getWatchHistory } from "@/services/history";
 import { getUserExp, UserExp } from "@/services/exp";
 import RankAvatarBorder from "@/components/RankAvatarBorder";
-
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 interface ProfileData {
   name: string;
@@ -105,7 +102,7 @@ function MenuItem({ icon, label, onPress, danger, secret }: MenuItemProps) {
 export default function ProfileScreen() {
   const router = useRouter();
   const scroll = useRef(new Animated.Value(0)).current;
-  const scrollRef = useRef<Animated.ScrollView>(null);
+  const scrollRef = useRef<ScrollView>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [expData, setExpData] = useState<UserExp | null>(null);
   const [stats, setStats] = useState<Stats>({
@@ -223,7 +220,7 @@ export default function ProfileScreen() {
         style: "destructive",
         onPress: async () => {
           await supabase.auth.signOut();
-          router.replace("/onboarded/login");
+          router.replace("/(auth)/login");
         },
       },
     ]);

@@ -38,7 +38,7 @@ export default function WelcomeScreen() {
         } else if (!user) {
           router.replace("/login");
         } else {
-          router.replace("/(tabs)");
+          router.replace("/(main)/(tabs)");
         }
 
         cleanExpiredCache();

@@ -1,5 +1,11 @@
 import { useRef, useState, useCallback } from "react";
-import { View, StyleSheet, Animated, RefreshControl } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Animated,
+  RefreshControl,
+  ScrollView,
+} from "react-native";
 
 import colors from "@/constants/colors";
 import GenreList from "@/components/GenreList";
@@ -11,7 +17,7 @@ import UserProfileHome from "@/components/UserProfileHome";
 
 export default function Home() {
   const scrollY = useRef(new Animated.Value(0)).current;
-  const scrollRef = useRef<Animated.ScrollView>(null);
+  const scrollRef = useRef<ScrollView>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 

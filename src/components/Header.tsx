@@ -5,12 +5,12 @@ import colors from "@/constants/colors";
 import Button from "@/components/Button";
 
 type Props = {
-  title: String;
+  title: string;
   scroll?: Animated.Value;
 };
 
 export default function Header({ title, scroll }: Props) {
-  const backgroundColor = scroll.interpolate({
+  const backgroundColor = scroll?.interpolate({
     inputRange: [0, 100],
     outputRange: ["rgba(26,26,41,0)", colors.background],
     extrapolate: "clamp",

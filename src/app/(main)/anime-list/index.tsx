@@ -5,7 +5,6 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  Dimensions,
   Animated,
   LayoutChangeEvent,
 } from "react-native";
@@ -18,9 +17,12 @@ import BackButton from "@/components/BackButton";
 import OngoingList from "./ongoing";
 import CompletedList from "./completed";
 
-import { getOngoingAnime, getCompleteAnime, type OngoingAnime, type CompletedAnime } from "@/services/otakudesu";
-
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
+import {
+  getOngoingAnime,
+  getCompleteAnime,
+  type OngoingAnime,
+  type CompletedAnime,
+} from "@/services/otakudesu";
 
 const TABS = [
   { key: "ongoing", label: "Ongoing" },

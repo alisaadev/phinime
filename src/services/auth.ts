@@ -72,10 +72,7 @@ export async function signInWithGoogle(): Promise<AuthResult> {
 // SIGN OUT
 export async function signOut(): Promise<void> {
   try {
-    const isSignedIn = await GoogleSignin.isSignedIn();
-    if (isSignedIn) {
-      await GoogleSignin.signOut();
-    }
+    await GoogleSignin.signOut();
   } catch (_) {
     // Ignore Google sign out error
   }
