@@ -22,7 +22,9 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "@react-native-google-signin/google-signin"
+      "@react-native-google-signin/google-signin",
+      "expo-video",
+      "expo-image"
     ],
     "ios": {
       "bundleIdentifier": "com.phinime"

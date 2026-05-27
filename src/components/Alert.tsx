@@ -16,7 +16,7 @@ import colors from "@/constants/colors";
 export type AlertVariant = "success" | "error" | "warning" | "info";
 
 interface AlertConfig {
-  icon: string;
+  icon: any;
   color: string;
   bg: string;
 }

@@ -31,7 +31,7 @@ export async function setCache<T>(cacheKey: string, data: T): Promise<void> {
     { onConflict: "cache_key" },
   );
 
-  if (error) return null;
+  if (error) return;
 }
 
 export async function deleteCache(cacheKey: string): Promise<void> {
@@ -46,7 +46,7 @@ export async function cleanExpiredCache(): Promise<void> {
     .delete()
     .lt("expires_at", now);
 
-  if (error) return null;
+  if (error) return;
 }
 
 export async function cacheOrFetch<T>(

@@ -138,6 +138,8 @@ export default function DetailAnimeScreen() {
     );
   }
 
+  if (!anime) return null;
+
   const synopsisText = anime.synopsis.paragraphs.join("\n\n");
   const SYNOPSIS_LINES = synopsisExpanded ? undefined : 4;
 
@@ -271,7 +273,7 @@ export default function DetailAnimeScreen() {
         {anime.batch && (
           <>
             <View style={styles.divider} />
-            <AnimeBatch batchId={anime.batch.batchId} />
+            <AnimeBatch batchId={anime.batch} />
           </>
         )}
         <View style={{ marginBottom: "24%" }} />
