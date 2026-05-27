@@ -24,7 +24,7 @@ import {
 
 const { width: SCREEN_WIDTH, height } = Dimensions.get("window");
 const PADDING = 16;
-const GAP = 6;
+const GAP = 8;
 const CARD_WIDTH = (SCREEN_WIDTH - PADDING * 2 - GAP * 2) / 3;
 const CARD_HEIGHT = CARD_WIDTH * 1.5;
 
@@ -264,13 +264,6 @@ const styles = StyleSheet.create({
     width: CARD_WIDTH,
     position: "relative",
   },
-  card: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
-    borderRadius: 10,
-    overflow: "hidden",
-    backgroundColor: colors.secondary,
-  },
   cardPlaceholder: {
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
@@ -286,15 +279,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     zIndex: 2,
-  },
-  progressTrack: {
-    height: 3,
-    backgroundColor: "rgba(255,255,255,0.15)",
-  },
-  progressFill: {
-    height: "100%",
-    backgroundColor: colors.accent,
-    borderRadius: 2,
   },
   loadingWrapper: {
     flex: 1,

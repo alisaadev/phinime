@@ -1,8 +1,5 @@
-// services/exp.ts — EXP & Level System
-
 import { supabase } from "@/lib/supabase";
 
-// CONSTANTS
 export const MAX_LEVEL = 93;
 export const EXP_PER_EPISODE_PAIR = 1;
 export const EXP_TO_LEVEL_LOW = 10;
@@ -61,7 +58,6 @@ export const RANKS: RankData[] = [
   },
 ];
 
-// TYPES
 export interface UserExp {
   id: string;
   user_id: string;
@@ -81,18 +77,11 @@ export interface LevelUpResult {
   prevRank: number;
 }
 
-/**
- * EXP yang dibutuhkan untuk naik dari level ini ke level berikutnya.
- */
 export function expRequiredForLevel(level: number): number {
   if (level >= MAX_LEVEL) return Infinity;
   return level >= 10 ? EXP_TO_LEVEL_HIGH : EXP_TO_LEVEL_LOW;
 }
 
-/**
- * Rank berdasarkan level (1 rank per 20 level).
- * Level 1–20 = rank 1, 21–40 = rank 2, dst.
- */
 export function getRankFromLevel(level: number): number {
   if (level <= 20) return 1;
   if (level <= 40) return 2;
@@ -100,10 +89,6 @@ export function getRankFromLevel(level: number): number {
   return 4;
 }
 
-/**
- * Hitung level & sisa EXP setelah menambahkan exp baru.
- * Mengembalikan { level, remainingExp }.
- */
 export function calculateLevelUp(
   currentLevel: number,
   currentExp: number,
@@ -122,7 +107,6 @@ export function calculateLevelUp(
     }
   }
 
-  // Di max level, exp tidak bertambah lagi
   if (level >= MAX_LEVEL) {
     return { level: MAX_LEVEL, remainingExp: 0 };
   }
@@ -130,18 +114,13 @@ export function calculateLevelUp(
   return { level, remainingExp: exp };
 }
 
-/**
- * Persentase progress ke level berikutnya (0–100).
- */
 export function getLevelProgress(level: number, exp: number): number {
   if (level >= MAX_LEVEL) return 100;
   const needed = expRequiredForLevel(level);
+
   return Math.min(100, Math.round((exp / needed) * 100));
 }
 
-/**
- * Ambil data EXP user. Kalau belum ada, buat baru (level 1).
- */
 export async function getUserExp(userId: string): Promise<UserExp | null> {
   const { data, error } = await supabase
     .from("user_exp")
@@ -154,7 +133,6 @@ export async function getUserExp(userId: string): Promise<UserExp | null> {
     return null;
   }
 
-  // Belum ada record → buat baru
   if (!data) {
     const { data: newData, error: insertError } = await supabase
       .from("user_exp")
@@ -173,23 +151,16 @@ export async function getUserExp(userId: string): Promise<UserExp | null> {
   return data as UserExp;
 }
 
-/**
- * Tambah EXP setelah episode selesai ditonton.
- * Dipanggil dari saveWatchHistory saat progress >= 90%.
- * Return info level up / rank up untuk ditampilkan notifikasi.
- */
 export async function addEpisodeExp(
   userId: string,
 ): Promise<LevelUpResult | null> {
   const current = await getUserExp(userId);
   if (!current) return null;
 
-  // Increment ep_counter — tiap 2 episode dapat 1 exp
   const newCounter = current.ep_counter + 1;
   const gainedExp = newCounter % 2 === 0 ? EXP_PER_EPISODE_PAIR : 0;
 
   if (gainedExp === 0) {
-    // Belum cukup 2 episode, update counter saja
     await supabase
       .from("user_exp")
       .update({ ep_counter: newCounter, updated_at: new Date().toISOString() })
@@ -197,7 +168,6 @@ export async function addEpisodeExp(
     return null;
   }
 
-  // Hitung level baru
   const { level: newLevel, remainingExp } = calculateLevelUp(
     current.level,
     current.exp,
@@ -208,7 +178,6 @@ export async function addEpisodeExp(
   const prevLevel = current.level;
   const prevRank = current.rank;
 
-  // Update ke database
   const { error } = await supabase
     .from("user_exp")
     .update({

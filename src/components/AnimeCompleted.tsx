@@ -3,10 +3,10 @@ import { useRouter } from "expo-router";
 import { useEffect, useState, memo, useCallback } from "react";
 import { TouchableOpacity, StyleSheet, View, Dimensions } from "react-native";
 
-import Icon from "@/components/Icon";
-import Text from "@/components/Text";
+import Icon from "./Icon";
+import Text from "./Text";
+import Loader from "./Loader";
 import colors from "@/constants/colors";
-import Loader from "@/components/Loader";
 import { getAnimeDetail, getHome } from "@/services/otakudesu";
 import type { AnimeDetail, CompletedAnime } from "@/services/otakudesu";
 
@@ -76,7 +76,12 @@ const AnimeCard = memo(({ item, onPress }: AnimeCardProps) => {
         <View style={styles.studioRow}>
           {!!studios && <Text style={styles.studio}>{studios}</Text>}
           {!!studios && !!score && <Text style={styles.dot}>{"•"}</Text>}
-          {!!score && <Text style={styles.score}>⭐ {score}</Text>}
+          {!!score && (
+            <View style={styles.score}>
+              <Icon name="Star" size={10} color="#FBBF24" fill="#FBBF24" />
+              <Text style={styles.scoreText}>{score}</Text>
+            </View>
+          )}
         </View>
 
         {!!synopsis && (
@@ -258,6 +263,12 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   score: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 2,
+  },
+  scoreText: {
     fontSize: 10,
     fontWeight: "600",
     color: colors.textSecondary,

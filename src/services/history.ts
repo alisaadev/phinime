@@ -1,8 +1,5 @@
-// services/history.ts — Watch History Service
-
 import { supabase } from "@/lib/supabase";
 
-// TYPES
 export interface WatchHistory {
   id: string;
   user_id: string;
@@ -27,21 +24,19 @@ export interface SaveWatchHistoryParams {
   duration_ms: number;
 }
 
-/** Persentase progress (0–100) */
 export function getProgressPercent(history: WatchHistory): number {
   if (!history.duration_ms || history.duration_ms === 0) return 0;
+
   return Math.min(
     100,
     Math.round((history.progress_ms / history.duration_ms) * 100),
   );
 }
 
-/** Apakah episode dianggap selesai (progress > 90%) */
 export function isWatched(history: WatchHistory): boolean {
   return getProgressPercent(history) >= 90;
 }
 
-/** Format progress menjadi string "12:34 / 24:00" */
 export function formatProgress(history: WatchHistory): string {
   const fmt = (ms: number) => {
     const totalSec = Math.floor(ms / 1000);
@@ -51,14 +46,10 @@ export function formatProgress(history: WatchHistory): string {
     const sec = (totalSec % 60).toString().padStart(2, "0");
     return `${min}:${sec}`;
   };
+
   return `${fmt(history.progress_ms)} / ${fmt(history.duration_ms)}`;
 }
 
-/**
- * Simpan atau update progress menonton.
- * Kalau episode sudah ada → update progress & watched_at.
- * Kalau belum ada → insert baru.
- */
 export async function saveWatchHistory(
   params: SaveWatchHistoryParams,
 ): Promise<void> {
@@ -82,10 +73,6 @@ export async function saveWatchHistory(
   }
 }
 
-/**
- * Ambil semua history user, diurutkan terbaru.
- * @param limit jumlah data yang diambil (default 50)
- */
 export async function getWatchHistory(
   userId: string,
   limit = 50,
@@ -105,10 +92,6 @@ export async function getWatchHistory(
   return data as WatchHistory[];
 }
 
-/**
- * Ambil progress satu episode spesifik.
- * Return null kalau belum pernah ditonton.
- */
 export async function getEpisodeProgress(
   userId: string,
   episodeId: string,
@@ -128,9 +111,6 @@ export async function getEpisodeProgress(
   return data as WatchHistory | null;
 }
 
-/**
- * Ambil history per anime (semua episode yang pernah ditonton dari satu anime).
- */
 export async function getAnimeWatchHistory(
   userId: string,
   animeId: string,

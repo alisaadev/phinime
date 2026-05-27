@@ -1,7 +1,6 @@
 import { useRouter } from "expo-router";
 import {
   StyleSheet,
-  TouchableOpacity,
   View,
   ViewStyle,
   TextStyle,

@@ -12,6 +12,7 @@ import GenreList from "@/components/GenreList";
 import AnimeTop from "@/components/AnimeTop";
 import HomeHeader from "@/components/HomeHeader";
 import AnimeRecent from "@/components/AnimeRecent";
+import HistorySearch from "@/components/HistorySearch";
 import AnimeCompleted from "@/components/AnimeCompleted";
 import UserProfileHome from "@/components/UserProfileHome";
 
@@ -57,11 +58,13 @@ export default function Home() {
         <UserProfileHome />
         <View style={styles.barrier} />
 
+        <HistorySearch key={`history-${refreshKey}`} />
+
         <GenreList key={`genre-${refreshKey}`} />
         <View style={styles.barrier} />
 
         <AnimeRecent key={`recent-${refreshKey}`} />
-        <View style={styles.barrier} />
+        <View style={{ marginBottom: 6 }} />
 
         <AnimeCompleted key={`completed-${refreshKey}`} />
         <View style={styles.barrier} />
@@ -78,7 +81,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   barrier: {
-    width: "100%",
     marginBottom: 14,
   },
   padding: {

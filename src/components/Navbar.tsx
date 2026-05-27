@@ -8,8 +8,8 @@ import {
   LayoutChangeEvent,
 } from "react-native";
 
-import Icon from "@/components/Icon";
-import Text from "@/components/Text";
+import Icon from "./Icon";
+import Text from "./Text";
 import colors from "@/constants/colors";
 
 const ITEMS = [
@@ -73,6 +73,7 @@ export default function Navbar({
   const renderIcon = (item: any, index: number) => {
     const active = selectedIndex === index;
     const color = active ? colors.accent : colors.textSecondary;
+
     return <Icon name={item.icon} size={26} color={color} />;
   };
 

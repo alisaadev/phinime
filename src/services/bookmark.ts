@@ -1,8 +1,5 @@
-// services/bookmark.ts — Bookmark Service
-
 import { supabase } from "@/lib/supabase";
 
-// TYPES
 export interface Bookmark {
   id: string;
   user_id: string;
@@ -23,11 +20,6 @@ export interface SaveBookmarkParams {
   score?: string;
 }
 
-
-/**
- * Tambah anime ke bookmark.
- * Kalau sudah ada > tidak duplikat (upsert).
- */
 export async function addBookmark(params: SaveBookmarkParams): Promise<void> {
   const { error } = await supabase.from("bookmarks").upsert(
     {
@@ -47,9 +39,6 @@ export async function addBookmark(params: SaveBookmarkParams): Promise<void> {
   }
 }
 
-/**
- * Hapus anime dari bookmark.
- */
 export async function removeBookmark(
   userId: string,
   animeId: string,
@@ -65,14 +54,11 @@ export async function removeBookmark(
   }
 }
 
-/**
- * Toggle bookmark — kalau sudah ada hapus, kalau belum ada tambah.
- * Return true kalau sekarang ter-bookmark, false kalau dihapus.
- */
 export async function toggleBookmark(
   params: SaveBookmarkParams,
 ): Promise<boolean> {
   const existing = await isBookmarked(params.user_id, params.anime_id);
+
   if (existing) {
     await removeBookmark(params.user_id, params.anime_id);
     return false;
@@ -82,9 +68,6 @@ export async function toggleBookmark(
   }
 }
 
-/**
- * Cek apakah anime sudah di-bookmark.
- */
 export async function isBookmarked(
   userId: string,
   animeId: string,
@@ -100,9 +83,6 @@ export async function isBookmarked(
   return data !== null;
 }
 
-/**
- * Ambil semua bookmark user, diurutkan terbaru.
- */
 export async function getBookmarks(userId: string): Promise<Bookmark[]> {
   const { data, error } = await supabase
     .from("bookmarks")
@@ -118,9 +98,6 @@ export async function getBookmarks(userId: string): Promise<Bookmark[]> {
   return data as Bookmark[];
 }
 
-/**
- * Hapus semua bookmark user.
- */
 export async function clearBookmarks(userId: string): Promise<void> {
   const { error } = await supabase
     .from("bookmarks")

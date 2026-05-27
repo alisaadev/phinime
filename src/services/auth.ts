@@ -1,7 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
-// KONFIGURASI — isi dengan Web Client ID dari Google Console
 GoogleSignin.configure({
   webClientId:
     "460160956613-v4pkpf70ulsipri4ntjqpl1ad7homcat.apps.googleusercontent.com",
@@ -19,11 +18,9 @@ export type AuthResult = {
   error?: string;
 };
 
-// GOOGLE SIGN IN
 export async function signInWithGoogle(): Promise<AuthResult> {
   try {
     await GoogleSignin.hasPlayServices();
-
     await GoogleSignin.signOut();
 
     const userInfo = await GoogleSignin.signIn();
@@ -69,22 +66,14 @@ export async function signInWithGoogle(): Promise<AuthResult> {
   }
 }
 
-// SIGN OUT
 export async function signOut(): Promise<void> {
-  try {
-    await GoogleSignin.signOut();
-  } catch (_) {
-    // Ignore Google sign out error
-  }
-
+  await GoogleSignin.signOut();
   await supabase.auth.signOut();
 }
 
-// GET CURRENT USER
 export async function getCurrentUser() {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getUser();
+  const user = data.user;
 
   if (!user) return null;
 
@@ -97,7 +86,6 @@ export async function getCurrentUser() {
   };
 }
 
-// LISTEN AUTH STATE CHANGE
 export function listenAuthChange(callback: (user: any | null) => void) {
   return supabase.auth.onAuthStateChange((_event, session) => {
     callback(session?.user ?? null);

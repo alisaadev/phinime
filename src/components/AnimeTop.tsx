@@ -1,6 +1,5 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { Play } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRef, useEffect, useState, memo, useCallback } from "react";
 import {
@@ -14,9 +13,10 @@ import {
   Animated,
 } from "react-native";
 
-import Text from "@/components/Text";
+import Icon from "./Icon";
+import Text from "./Text";
+import Button from "./Button";
 import colors from "@/constants/colors";
-import Button from "@/components/Button";
 import { getHome, Top10Item } from "@/services/samehadaku";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -98,12 +98,12 @@ const AnimeCard = memo(({ item, index, onPress }: AnimeCardProps) => (
       <View style={styles.bottomRow}>
         <Button button={styles.watchButton} onPress={onPress}>
           <View style={styles.playIconWrapper}>
-            <Play fill={colors.accent} size={12} color={colors.accent} />
+            <Icon name="Play" size={12} color={colors.secondary} fill={colors.secondary} />
           </View>
           <Text style={styles.watchText}>Tonton</Text>
         </Button>
         <View style={styles.scoreBadge}>
-          <Text style={styles.scoreStar}>⭐</Text>
+          <Icon name="Star" size={12} color="#FBBF24" fill="#FBBF24" />
           <Text style={styles.scoreText}>{item.score}</Text>
         </View>
       </View>
@@ -320,9 +320,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
     gap: 3,
-  },
-  scoreStar: {
-    fontSize: 10,
   },
   scoreText: {
     color: colors.accent,

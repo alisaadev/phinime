@@ -8,11 +8,11 @@ import {
   Dimensions,
 } from "react-native";
 
-import Icon from "@/components/Icon";
-import Text from "@/components/Text";
+import Icon from "./Icon";
+import Text from "./Text";
+import Loader from "./Loader";
+import AnimeCard from "./AnimeCard";
 import colors from "@/constants/colors";
-import Loader from "@/components/Loader";
-import AnimeCard from "@/components/AnimeCard";
 import { getHome, OngoingAnime } from "@/services/otakudesu";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");

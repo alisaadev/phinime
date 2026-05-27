@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Animated,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   ScrollView,
 } from "react-native";
@@ -21,6 +20,8 @@ import ExpCard from "@/components/ExpCard";
 import { getBookmarks } from "@/services/bookmark";
 import { getWatchHistory } from "@/services/history";
 import { getUserExp, UserExp } from "@/services/exp";
+import { AlertDialog, Toast } from "@/components/Alert";
+import { useAlertDialog, useToast } from "@/hooks/useAlert";
 import RankAvatarBorder from "@/components/RankAvatarBorder";
 
 interface ProfileData {
@@ -114,6 +115,14 @@ export default function ProfileScreen() {
   const [avatarLoading, setAvatarLoading] = useState(false);
   const [easterEggCount, setEasterEggCount] = useState(0);
 
+  const {
+    state: alertState,
+    confirm,
+    show: showDialog,
+    hide: hideAlert,
+  } = useAlertDialog();
+  const { state: toastState, error: toastError, hide: hideToast } = useToast();
+
   useEffect(() => {
     fetchAll();
   }, []);
@@ -157,10 +166,12 @@ export default function ProfileScreen() {
   const handlePickAvatar = useCallback(async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert(
-        "Izin diperlukan",
-        "Izinkan akses galeri untuk mengganti foto profil.",
-      );
+      showDialog({
+        title: "Izin diperlukan",
+        message: "Izinkan akses galeri untuk mengganti foto profil.",
+        confirmText: "Siap",
+        onConfirm: hideAlert,
+      });
       return;
     }
 
@@ -206,28 +217,26 @@ export default function ProfileScreen() {
       setProfile((prev) => (prev ? { ...prev, avatarUrl: publicUrl } : prev));
     } catch (err) {
       console.error("[Profile] Gagal upload avatar:", err);
-      Alert.alert("Gagal", "Tidak dapat mengganti foto profil. Coba lagi.");
+      toastError("Gagal", "Tidak dapat mengganti foto profil. Coba lagi.");
     } finally {
       setAvatarLoading(false);
     }
-  }, []);
+  }, [showDialog, hideAlert, toastError]);
 
   const handleSignOut = useCallback(() => {
-    Alert.alert("Sign Out", "Yakin ingin keluar?", [
-      { text: "Batal", style: "cancel" },
-      {
-        text: "Sign Out",
-        style: "destructive",
-        onPress: async () => {
-          await supabase.auth.signOut();
-          router.replace("/(auth)/login");
-        },
+    confirm(
+      "Sign Out",
+      "Yakin ingin keluar?",
+      async () => {
+        await supabase.auth.signOut();
+        router.replace("/(auth)/login");
       },
-    ]);
-  }, [router]);
+      { variant: "warning", confirmText: "Sign Out" },
+    );
+  }, [router, confirm]);
 
   const handleSettings = useCallback(() => {
-    router.push("/");
+    router.push("/search/");
   }, [router]);
 
   const handleEasterEgg = useCallback(() => {
@@ -250,8 +259,12 @@ export default function ProfileScreen() {
     ];
 
     const msg = messages[Math.min(count - 1, messages.length - 1)];
-    Alert.alert(msg.title, msg.message);
-  }, [easterEggCount]);
+    showDialog({
+      title: msg.title,
+      message: msg.message,
+      onConfirm: hideAlert,
+    });
+  }, [easterEggCount, showDialog, hideAlert]);
 
   if (loading) {
     return (
@@ -343,6 +356,9 @@ export default function ProfileScreen() {
 
         <View style={styles.padding} />
       </Animated.ScrollView>
+
+      <AlertDialog {...alertState} onDismiss={hideAlert} />
+      <Toast {...toastState} onHide={hideToast} />
     </View>
   );
 }

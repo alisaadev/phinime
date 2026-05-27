@@ -3,12 +3,14 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 
-import Text from "@/components/Text";
+import Text from "./Text";
+import Button from "./Button";
+import ExpCard from "./ExpCard";
+import { AlertDialog } from "./Alert";
 import colors from "@/constants/colors";
 import { signOut } from "@/services/auth";
 import { supabase } from "@/lib/supabase";
-import Button from "@/components/Button";
-import ExpCard from "@/components/ExpCard";
+import { useAlertDialog } from "@/hooks/useAlert";
 
 type UserData = {
   name: string;
@@ -19,6 +21,7 @@ type UserData = {
 export default function UserProfileHome() {
   const router = useRouter();
   const [user, setUser] = useState<UserData | null>(null);
+  const { state: alertState, confirm, hide: hideAlert } = useAlertDialog();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -31,9 +34,16 @@ export default function UserProfileHome() {
     });
   }, []);
 
-  const handleSignOut = async () => {
-    await signOut();
-    router.replace("/login");
+  const handleSignOut = () => {
+    confirm(
+      "Sign Out",
+      "Yakin ingin keluar?",
+      async () => {
+        await signOut();
+        router.replace("/(auth)/login");
+      },
+      { variant: "warning", confirmText: "Sign Out" },
+    );
   };
 
   if (!user) return null;
@@ -62,6 +72,7 @@ export default function UserProfileHome() {
       </View>
 
       <ExpCard variant="compact" />
+      <AlertDialog {...alertState} onDismiss={hideAlert} />
     </View>
   );
 }

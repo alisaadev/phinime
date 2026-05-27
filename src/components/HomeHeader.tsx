@@ -5,14 +5,15 @@ import {
   StyleSheet,
   Animated,
   TouchableOpacity,
-  ToastAndroid,
   Keyboard,
 } from "react-native";
 
-import Icon from "@/components/Icon";
-import Text from "@/components/Text";
+import Icon from "./Icon";
+import Text from "./Text";
+import { Toast } from "./Alert";
+import TextInput from "./TextInput";
 import colors from "@/constants/colors";
-import TextInput from "@/components/TextInput";
+import { useToast } from "@/hooks/useAlert";
 
 type Props = {
   scrollY: Animated.Value;
@@ -20,6 +21,7 @@ type Props = {
 
 export default function HomeHeader({ scrollY }: Props) {
   const router = useRouter();
+  const { state: toast, show: showToast, hide: hideToast } = useToast();
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<any>(null);
@@ -84,68 +86,78 @@ export default function HomeHeader({ scrollY }: Props) {
 
   const handleSearch = () => {
     if (!query.trim()) {
-      ToastAndroid.show(
-        "Anime apa yang ingin kamu cari?...",
-        ToastAndroid.SHORT,
-      );
+      showToast("Pencarian Kosong", {
+        message: "Anime apa yang ingin kamu cari?...",
+        variant: "warning",
+      });
     } else {
       router.push(`/search/${query.trim()}`);
     }
   };
 
   return (
-    <Animated.View style={[styles.header, { backgroundColor }]}>
-      <Animated.View style={[styles.pill, { width: animatedWidth }]}>
-        <Animated.View
-          style={[
-            StyleSheet.absoluteFill,
-            styles.pillContent,
-            { opacity: textOpacity },
-          ]}
-          pointerEvents={searchOpen ? "none" : "auto"}
-        >
-          <Text style={styles.logo}>phinime</Text>
+    <>
+      <Animated.View style={[styles.header, { backgroundColor }]}>
+        <Animated.View style={[styles.pill, { width: animatedWidth }]}>
+          <Animated.View
+            style={[
+              StyleSheet.absoluteFill,
+              styles.pillContent,
+              { opacity: textOpacity },
+            ]}
+            pointerEvents={searchOpen ? "none" : "auto"}
+          >
+            <Text style={styles.logo}>phinime</Text>
+          </Animated.View>
+
+          <Animated.View
+            style={[
+              StyleSheet.absoluteFill,
+              styles.pillContent,
+              { opacity: inputOpacity },
+            ]}
+            pointerEvents={searchOpen ? "auto" : "none"}
+          >
+            <Icon name="Search" size={14} color={colors.textDark} />
+            <TextInput
+              ref={inputRef}
+              style={styles.searchInput}
+              placeholder="Cari anime..."
+              placeholderTextColor={colors.textDark}
+              value={query}
+              onChangeText={setQuery}
+              returnKeyType="search"
+              onSubmitEditing={handleSearch}
+            />
+            {query.length > 0 && (
+              <TouchableOpacity onPress={() => setQuery("")}>
+                <Icon name="X" size={14} color={colors.textDark} />
+              </TouchableOpacity>
+            )}
+          </Animated.View>
         </Animated.View>
 
-        <Animated.View
-          style={[
-            StyleSheet.absoluteFill,
-            styles.pillContent,
-            { opacity: inputOpacity },
-          ]}
-          pointerEvents={searchOpen ? "auto" : "none"}
+        <TouchableOpacity
+          onPress={searchOpen ? closeSearch : openSearch}
+          style={styles.iconButton}
+          activeOpacity={0.8}
         >
-          <Icon name="Search" size={14} color={colors.textDark} />
-          <TextInput
-            ref={inputRef}
-            style={styles.searchInput}
-            placeholder="Cari anime..."
-            placeholderTextColor={colors.textDark}
-            value={query}
-            onChangeText={setQuery}
-            returnKeyType="search"
-            onSubmitEditing={handleSearch}
+          <Icon
+            name={searchOpen ? "X" : "Search"}
+            size={22}
+            color={colors.text}
           />
-          {query.length > 0 && (
-            <TouchableOpacity onPress={() => setQuery("")}>
-              <Icon name="X" size={14} color={colors.textDark} />
-            </TouchableOpacity>
-          )}
-        </Animated.View>
+        </TouchableOpacity>
       </Animated.View>
 
-      <TouchableOpacity
-        onPress={searchOpen ? closeSearch : openSearch}
-        style={styles.iconButton}
-        activeOpacity={0.8}
-      >
-        <Icon
-          name={searchOpen ? "X" : "Search"}
-          size={22}
-          color={colors.text}
-        />
-      </TouchableOpacity>
-    </Animated.View>
+      <Toast
+        visible={toast.visible}
+        variant={toast.variant}
+        title={toast.title}
+        message={toast.message}
+        onHide={hideToast}
+      />
+    </>
   );
 }
 

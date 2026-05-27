@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { View, StyleSheet, Pressable, ToastAndroid } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
 
 import Text from "@/components/Text";
 import colors from "@/constants/colors";
 import Loader from "@/components/Loader";
 import Button from "@/components/Button";
 import { signInWithGoogle } from "@/services/auth";
+import { useToast } from "@/hooks/useAlert";
+import { Toast } from "@/components/Alert";
 
 export default function Login() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const { state: toastState, success, error, hide } = useToast();
 
   const handleGoogle = async () => {
     setLoading(true);
@@ -19,16 +22,14 @@ export default function Login() {
     setLoading(false);
 
     if (result.success) {
-      router.replace("/(main)/(tabs)");
-      ToastAndroid.show(
-        "Berhasil Login dengan Akun " + result.user?.email,
-        ToastAndroid.SHORT,
-      );
+      success("Berhasil Login", "Selamat datang kembali!");
+      setTimeout(() => {
+        router.replace("/(main)/(tabs)");
+      }, 1500);
     } else {
-      ToastAndroid.show(
-        typeof result.error === "string" ? result.error : "An error occurred",
-        ToastAndroid.SHORT,
-      );
+      const msg =
+        typeof result.error === "string" ? result.error : "Terjadi kesalahan";
+      error("Login Gagal", msg);
       console.error(result.error);
     }
   };
@@ -65,6 +66,7 @@ export default function Login() {
           </View>
         )}
       </View>
+      <Toast {...toastState} onHide={hide} />
     </View>
   );
 }

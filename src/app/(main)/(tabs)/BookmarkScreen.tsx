@@ -6,7 +6,6 @@ import {
   FlatList,
   TouchableOpacity,
   Dimensions,
-  Alert,
   Animated,
 } from "react-native";
 
@@ -23,10 +22,12 @@ import {
   clearBookmarks,
   Bookmark,
 } from "@/services/bookmark";
+import { useAlertDialog } from "@/hooks/useAlert";
+import { AlertDialog } from "@/components/Alert";
 
 const { width: SCREEN_WIDTH, height } = Dimensions.get("window");
 const PADDING = 16;
-const GAP = 6;
+const GAP = 8;
 const CARD_WIDTH = (SCREEN_WIDTH - PADDING * 2 - GAP * 2) / 3;
 const CARD_HEIGHT = CARD_WIDTH * 1.5;
 
@@ -73,6 +74,8 @@ export default function BookmarkScreen() {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
 
+  const { state: alertState, confirm, hide: hideAlert } = useAlertDialog();
+
   useEffect(() => {
     initUser();
   }, []);
@@ -99,44 +102,34 @@ export default function BookmarkScreen() {
 
   const handleLongPress = useCallback(
     (item: Bookmark) => {
-      Alert.alert(
+      confirm(
         "Hapus Bookmark",
         `Hapus "${item.anime_title}" dari bookmark?`,
-        [
-          { text: "Batal", style: "cancel" },
-          {
-            text: "Hapus",
-            style: "destructive",
-            onPress: async () => {
-              if (!userId) return;
-              await removeBookmark(userId, item.anime_id);
-              await fetchBookmarks(userId);
-            },
-          },
-        ],
+        async () => {
+          if (!userId) return;
+          await removeBookmark(userId, item.anime_id);
+          await fetchBookmarks(userId);
+          hideAlert();
+        },
+        { variant: "error", confirmText: "Hapus" },
       );
     },
-    [userId],
+    [userId, confirm, hideAlert],
   );
 
   const handleClearAll = useCallback(() => {
-    Alert.alert(
+    confirm(
       "Hapus Semua Bookmark",
       "Yakin ingin menghapus semua bookmark?",
-      [
-        { text: "Batal", style: "cancel" },
-        {
-          text: "Hapus Semua",
-          style: "destructive",
-          onPress: async () => {
-            if (!userId) return;
-            await clearBookmarks(userId);
-            setBookmarks([]);
-          },
-        },
-      ],
+      async () => {
+        if (!userId) return;
+        await clearBookmarks(userId);
+        setBookmarks([]);
+        hideAlert();
+      },
+      { variant: "error", confirmText: "Hapus Semua" },
     );
-  }, [userId]);
+  }, [userId, confirm, hideAlert]);
 
   const renderItem = useCallback(
     ({ item }: { item: Bookmark }) => (
@@ -190,6 +183,8 @@ export default function BookmarkScreen() {
           ListFooterComponent={<View style={{ marginBottom: "24%" }} />}
         />
       )}
+
+      <AlertDialog {...alertState} onDismiss={hideAlert} />
     </View>
   );
 }
@@ -220,56 +215,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: PADDING,
     paddingBottom: 100,
     marginTop: 56,
-    gap: GAP,
   },
   row: {
     gap: GAP,
-  },
-  card: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
-    borderRadius: 14,
-    overflow: "hidden",
-    backgroundColor: colors.secondary,
-  },
-  overlay: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: "60%",
-  },
-  statusText: {
-    fontSize: 9,
-    fontWeight: "700",
-  },
-  cardInfo: {
-    position: "absolute",
-    bottom: 10,
-    left: 10,
-    right: 10,
-    gap: 4,
-  },
-  cardTitle: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: colors.text,
-    lineHeight: 16,
   },
   score: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-  },
-  scoreRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 3,
-  },
-  scoreText: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: colors.text,
   },
   loadingWrapper: {
     flex: 1,

@@ -1,12 +1,7 @@
-// Anime API Client - sankavollerei.com
-// Base URL: https://www.sankavollerei.com/anime
-// Integrated with Cache (cache.ts)
-
 import { cacheOrFetch, saveSearchHistory } from "@/services/cache";
 
 const BASE_URL = "https://www.sankavollerei.com/anime";
 
-// TYPES
 export interface ApiResponse<T> {
   status: string;
   creator: string;
@@ -235,14 +230,12 @@ async function fetchApi<T>(
   return { ...json.data, pagination: json.pagination };
 }
 
-/** GET /anime/home — Halaman utama (ongoing + completed) */
 export async function getHome(): Promise<
   HomeData & { pagination: Pagination | null }
 > {
   return cacheOrFetch("anime:home", () => fetchApi<HomeData>("/home"));
 }
 
-/** GET /anime/schedule — Jadwal rilis anime per hari */
 export async function getSchedule(): Promise<ScheduleDay[]> {
   return cacheOrFetch("anime:schedule", async () => {
     const url = `${BASE_URL}/schedule`;
@@ -257,7 +250,6 @@ export async function getSchedule(): Promise<ScheduleDay[]> {
   });
 }
 
-/** GET /anime/genre — Daftar semua genre */
 export async function getGenres(): Promise<{
   genreList: Genre[];
   pagination: Pagination | null;
@@ -267,7 +259,6 @@ export async function getGenres(): Promise<{
   );
 }
 
-/** GET /anime/genre/:slug — Daftar anime berdasarkan genre */
 export async function getAnimeByGenre(
   genreId: string,
   page = 1,
@@ -277,7 +268,6 @@ export async function getAnimeByGenre(
   );
 }
 
-/** GET /anime/anime/:slug — Detail lengkap sebuah anime */
 export async function getAnimeDetail(
   slug: string,
 ): Promise<AnimeDetail & { pagination: Pagination | null }> {
@@ -286,7 +276,6 @@ export async function getAnimeDetail(
   );
 }
 
-/** GET /anime/ongoing-anime — Daftar anime ongoing */
 export async function getOngoingAnime(
   page = 1,
 ): Promise<{ animeList: OngoingAnime[]; pagination: Pagination | null }> {
@@ -295,7 +284,6 @@ export async function getOngoingAnime(
   );
 }
 
-/** GET /anime/complete-anime — Daftar anime tamat */
 export async function getCompleteAnime(
   page = 1,
 ): Promise<{ animeList: CompletedAnime[]; pagination: Pagination | null }> {
@@ -304,7 +292,6 @@ export async function getCompleteAnime(
   );
 }
 
-/** GET /anime/episode/:slug — Detail episode + link streaming & download */
 export async function getEpisode(
   slug: string,
 ): Promise<EpisodeDetail & { pagination: Pagination | null }> {
@@ -313,7 +300,6 @@ export async function getEpisode(
   );
 }
 
-/** GET /anime/batch/:slug — Link download batch anime */
 export async function getBatch(
   slug: string,
 ): Promise<BatchData & { pagination: Pagination | null }> {
@@ -322,7 +308,6 @@ export async function getBatch(
   );
 }
 
-/** GET /anime/search/:keyword — Pencarian anime */
 export async function searchAnime(
   keyword: string,
   userId?: string,
@@ -343,14 +328,12 @@ export async function searchAnime(
   });
 }
 
-/** GET /anime/server/:serverId — URL embed streaming berdasarkan server ID */
 export async function getServerUrl(
   serverId: string,
 ): Promise<ServerData & { pagination: Pagination | null }> {
   return fetchApi<ServerData>(`/server/${serverId}`);
 }
 
-/** GET /anime/unlimited — Semua data anime */
 export async function getAllAnime(): Promise<{
   animeList: UnlimitedAnime[];
   pagination: Pagination | null;

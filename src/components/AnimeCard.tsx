@@ -1,8 +1,8 @@
-import { Image } from "expo-image";
 import { memo } from "react";
+import { Image } from "expo-image";
 import { StyleSheet, View, TouchableOpacity, Dimensions } from "react-native";
 
-import Text from "@/components/Text";
+import Text from "./Text";
 import colors from "@/constants/colors";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");

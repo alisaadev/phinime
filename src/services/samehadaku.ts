@@ -1,10 +1,7 @@
-// services/api.ts — API Service + Cache Terintegrasi
-
 import { cacheOrFetch, saveSearchHistory } from "@/services/cache";
 
 const BASE_URL = "https://www.sankavollerei.com/anime/samehadaku";
 
-// TYPES
 export type ApiResponse<T> = {
   status: "success" | "error";
   creator: string;
@@ -209,25 +206,14 @@ async function fetchApi<T>(endpoint: string): Promise<T> {
   return json.data;
 }
 
-/**
- * Home — refresh tiap 10 menit (global cache)
- * Berisi: recent, batch, movie, top10
- */
 export const getHome = () =>
   cacheOrFetch<HomeData>("home", () => fetchApi<HomeData>("/home"));
 
-/**
- * Recent — cache per halaman
- */
 export const getRecent = (page = 1) =>
   cacheOrFetch<{ animeList: AnimeListItem[] }>(`recent:page:${page}`, () =>
     fetchApi(`/recent?page=${page}`),
   );
 
-/**
- * Search — cache per query + halaman (global)
- * userId opsional: jika diberikan, query disimpan ke history user
- */
 export const searchAnime = async (query: string, page = 1, userId?: string) => {
   const trimmed = query.trim().toLowerCase();
   const cacheKey = `search:${trimmed}:page:${page}`;
@@ -237,7 +223,6 @@ export const searchAnime = async (query: string, page = 1, userId?: string) => {
     () => fetchApi(`/search?q=${encodeURIComponent(trimmed)}&page=${page}`),
   );
 
-  // Simpan ke history user (fire and forget)
   if (userId && trimmed) {
     saveSearchHistory(userId, trimmed).catch(() => {});
   }
@@ -245,9 +230,6 @@ export const searchAnime = async (query: string, page = 1, userId?: string) => {
   return result;
 };
 
-/**
- * Ongoing — cache per halaman + order
- */
 export const getOngoing = (
   page = 1,
   order: "popular" | "latest" | "update" = "popular",
@@ -257,9 +239,6 @@ export const getOngoing = (
     () => fetchApi(`/ongoing?page=${page}&order=${order}`),
   );
 
-/**
- * Completed — cache per halaman + order
- */
 export const getCompleted = (
   page = 1,
   order: "latest" | "popular" | "update" = "latest",
@@ -269,17 +248,11 @@ export const getCompleted = (
     () => fetchApi(`/completed?page=${page}&order=${order}`),
   );
 
-/**
- * Popular — cache per halaman
- */
 export const getPopular = (page = 1) =>
   cacheOrFetch<{ animeList: AnimeListItem[] }>(`popular:page:${page}`, () =>
     fetchApi(`/populer?page=${page}`),
   );
 
-/**
- * Movies — cache per halaman + order
- */
 export const getMovies = (
   page = 1,
   order: "update" | "popular" | "latest" = "update",
@@ -289,71 +262,44 @@ export const getMovies = (
     () => fetchApi(`/movies?page=${page}&order=${order}`),
   );
 
-/**
- * Anime List A-Z — jarang berubah, cache lebih lama tidak masalah
- */
 export const getAnimeList = () =>
   cacheOrFetch<{ list: AnimeListGroup[] }>("anime_list", () =>
     fetchApi("/list"),
   );
 
-/**
- * Schedule — refresh tiap 10 menit
- */
 export const getSchedule = () =>
   cacheOrFetch<{ days: ScheduleDay[] }>("schedule", () =>
     fetchApi("/schedule"),
   );
 
-/**
- * Genres — jarang berubah
- */
 export const getGenres = () =>
   cacheOrFetch<{ genreList: Genre[] }>("genres", () => fetchApi("/genres"));
 
-/**
- * Anime by Genre — cache per genreId + halaman
- */
 export const getByGenre = (genreId: string, page = 1) =>
   cacheOrFetch<{ animeList: AnimeListItem[] }>(
     `genre:${genreId}:page:${page}`,
     () => fetchApi(`/genres/${genreId}?page=${page}`),
   );
 
-/**
- * Batch List — cache per halaman
- */
 export const getBatchList = (page = 1) =>
   cacheOrFetch<{ batchList: BatchListItem[] }>(`batch_list:page:${page}`, () =>
     fetchApi(`/batch?page=${page}`),
   );
 
-/**
- * Detail Anime — cache per animeId
- */
 export const getAnimeDetail = (animeId: string) =>
   cacheOrFetch<AnimeDetail>(`anime:${animeId}`, () =>
     fetchApi(`/anime/${animeId}`),
   );
 
-/**
- * Detail Episode — cache per episodeId
- */
 export const getEpisodeDetail = (episodeId: string) =>
   cacheOrFetch<EpisodeDetail>(`episode:${episodeId}`, () =>
     fetchApi(`/episode/${episodeId}`),
   );
 
-/**
- * Detail Batch — cache per batchId
- */
 export const getBatchDetail = (batchId: string) =>
   cacheOrFetch<BatchDetail>(`batch:${batchId}`, () =>
     fetchApi(`/batch/${batchId}`),
   );
 
-/**
- * Server URL — TIDAK di-cache karena URL streaming biasanya temporary
- */
 export const getServerUrl = (serverId: string) =>
   fetchApi<ServerData>(`/server/${serverId}`);

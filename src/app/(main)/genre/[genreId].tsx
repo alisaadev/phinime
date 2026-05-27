@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { View, StyleSheet, FlatList, Dimensions } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import colors from "@/constants/colors";
 import AnimeCard from "@/components/AnimeCard";

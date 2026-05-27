@@ -11,6 +11,8 @@ import Loader from "@/components/Loader";
 import Button from "@/components/Button";
 import { getSchedule } from "@/services/otakudesu";
 import BackButton from "@/components/BackButton";
+import { useToast } from "@/hooks/useAlert";
+import { Toast } from "@/components/Alert";
 
 const DAY_ORDER = [
   "Senin",
@@ -126,6 +128,7 @@ export default function ScheduleScreen() {
   const [schedule, setSchedule] = useState<ScheduleDay[]>([]);
   const [selectedDay, setSelectedDay] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const { state: toastState, error: toastError, hide: hideToast } = useToast();
   const todayId = JS_DAY_TO_ID[new Date().getDay()];
 
   useEffect(() => {
@@ -144,7 +147,7 @@ export default function ScheduleScreen() {
       const todayData = sorted.find((s) => s.day === todayId);
       setSelectedDay(todayData ? todayId : (sorted[0]?.day ?? ""));
     } catch (e) {
-      console.log("[Schedule] Gagal fetch", e);
+      toastError("Gagal", "Tidak dapat memuat jadwal tayang.");
     } finally {
       setLoading(false);
     }
@@ -210,6 +213,7 @@ export default function ScheduleScreen() {
             ListFooterComponent={<View style={{ marginBottom: "24%" }} />}
           />
         )}
+        <Toast {...toastState} onHide={hideToast} />
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -249,9 +253,10 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   divider: {
-    height: 1,
-    backgroundColor: colors.accent,
-    marginHorizontal: 24,
+    height: 0.8,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    marginHorizontal: 16,
+    marginTop: 8,
     marginBottom: 14,
   },
   listContainer: {
